@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} · ZwangerenkaartAI</title>
+<link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+<script>try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
+</head>
+<body>
+<div class="doc">
+  <nav class="doc-nav" aria-label="Pagina's">
+    <a class="home" href="{{ '/' | relative_url }}">ZwangerenkaartAI</a>
+    <a href="{{ '/methode.html' | relative_url }}">Methode</a>
+    <a href="{{ '/validatieprotocol.html' | relative_url }}">Validatieprotocol</a>
+    <a href="{{ '/mdr-en-privacy.html' | relative_url }}">MDR en privacy</a>
+    <a href="{{ '/beperkingen.html' | relative_url }}">Beperkingen</a>
+    <a href="{{ '/versies.html' | relative_url }}">Versies</a>
+    <a href="https://github.com/Andymaarten/ZwangerenkaartAI">Code</a>
+  </nav>
+  <main>
+{{ content }}
+  </main>
+</div>
+<footer>
+  <div class="wrap">
+    <p>© 2026 de auteurs. Alle rechten voorbehouden. Niet bedoeld voor klinisch gebruik buiten de validatieomgeving.</p>
+  </div>
+</footer>
+</body>
+</html>

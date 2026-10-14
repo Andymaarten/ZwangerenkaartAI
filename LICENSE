@@ -1,0 +1,18 @@
+Copyright (c) 2026 Pieter-Kees de Groot, Andreas Viruly, Bart Voskamp, Wouter Huijbers, Diederik Feilzer
+(Spaarne Gasthuis). Alle rechten voorbehouden.
+
+De documentatie, gegevens en scripts in deze repository zijn openbaar gemaakt uitsluitend ter inzage, zodat de
+werking en de validatie van ZwangerenkaartAI te controleren zijn. Zonder voorafgaande schriftelijke toestemming van de
+rechthebbenden is het niet toegestaan deze geheel of gedeeltelijk te gebruiken, te kopiëren, te wijzigen, te
+verspreiden of in te zetten, voor welk doel dan ook. Citeren met bronvermelding is toegestaan.
+
+ZwangerenkaartAI is niet bedoeld voor klinisch gebruik buiten de validatieomgeving van het Spaarne Gasthuis. De
+software wordt geleverd zoals ze is, zonder enige garantie. De rechthebbenden zijn niet aansprakelijk voor schade die
+voortvloeit uit gebruik van de software of de gegevens.
+
+---
+
+Copyright (c) 2026 the authors (Spaarne Gasthuis). All rights reserved. The documentation, data and scripts in this
+repository are published for inspection only. Any use, copying, modification, distribution or deployment requires
+prior written permission. Not intended for clinical use outside the validation setting. Provided "as is", without
+warranty of any kind.

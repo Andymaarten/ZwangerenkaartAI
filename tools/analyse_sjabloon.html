@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Validatie aandachtspunten</title>
+<style>
+:root { --bg:#fbfaf8; --fg:#1d1d1b; --mut:#6b6a66; --lijn:#e3e1dc; --kaart:#fff; --acc:#2f6f8f; --goed:#2e7d4f; --fout:#b23b3b; --geel:#a7741a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#171716; --fg:#ecebe8; --mut:#a3a19c; --lijn:#34332f; --kaart:#21201e; --acc:#7cb8d6; --goed:#6cc391; --fout:#e38080; --geel:#e0b25a; } }
+:root[data-theme="dark"] { --bg:#171716; --fg:#ecebe8; --mut:#a3a19c; --lijn:#34332f; --kaart:#21201e; --acc:#7cb8d6; --goed:#6cc391; --fout:#e38080; --geel:#e0b25a; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width:1100px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:22px; margin:0 0 4px; } h2 { font-size:17px; margin:32px 0 10px; }
+.mut { color:var(--mut); } .let-op { background:var(--fout); color:#fff; padding:8px 12px; border-radius:6px; }
+.blok { background:var(--kaart); border:1px solid var(--lijn); border-radius:10px; padding:16px; }
+.cijfers { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; }
+.cijfer b { display:block; font-size:24px; font-variant-numeric:tabular-nums; } .cijfer span { color:var(--mut); font-size:13px; }
+.schuif { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:16px 0; }
+.schuif input { flex:1; min-width:200px; }
+.grafieken { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:12px; }
+svg { width:100%; height:auto; display:block; } svg text { fill:var(--mut); font-size:11px; }
+.tabel { overflow-x:auto; } table { border-collapse:collapse; width:100%; font-size:13.5px; font-variant-numeric:tabular-nums; }
+th, td { text-align:left; padding:5px 8px; border-bottom:1px solid var(--lijn); vertical-align:top; }
+th { color:var(--mut); font-weight:600; cursor:pointer; white-space:nowrap; }
+.fn { color:var(--fout); font-weight:600; } .fp { color:var(--geel); } .tp { color:var(--goed); }
+details { margin:6px 0; } summary { cursor:pointer; }
+.pas { margin:2px 0 2px 16px; font-size:13px; } .pas i { color:var(--mut); font-style:normal; display:inline-block; min-width:44px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Validatie aandachtspunten</h1>
+<p class="mut" id="kop"></p>
+<!--WAARSCHUWING-->
+<div class="schuif blok">
+  <label for="d">Drempel P(ja)</label>
+  <input id="d" type="range" min="0" max="1" step="0.01">
+  <b id="dw"></b><span class="mut" id="dm"></span>
+</div>
+<div class="cijfers" id="cijfers"></div>
+<h2>Curves</h2>
+<div class="grafieken">
+  <div class="blok"><b>ROC</b> <span class="mut" id="auc"></span><svg id="roc" viewBox="0 0 300 300"></svg></div>
+  <div class="blok"><b>Precision-recall</b> <span class="mut" id="prauc"></span><svg id="pr" viewBox="0 0 300 300"></svg></div>
+  <div class="blok"><b>Verdeling van de AP-score</b> <span class="mut">positief <span class="tp">■</span> negatief <span class="fp">■</span> (wortelschaal)</span><svg id="hist" viewBox="0 0 300 300"></svg></div>
+  <div class="blok"><b>Recall en PPV per drempel</b> <span class="mut">recall <span class="tp">━</span> PPV <span class="fp">━</span></span><svg id="rd" viewBox="0 0 300 300"></svg></div>
+</div>
+<h2>Per kaart</h2>
+<div class="blok tabel"><table id="tk"></table></div>
+<h2>Per aandachtspunt <span class="mut">(alleen AP's met een positief geval of een fout-positief)</span></h2>
+<div class="blok tabel"><table id="ta"></table></div>
+<div id="detail"></div>
+</main>
+<script>
+const D = /*DATA*/null;
+const rijen = D.kaarten.flatMap(k => k.aps.map(a => ({...a, k: k.k})));
+const P = rijen.filter(r => r.y).length, N = rijen.length - P, nk = D.kaarten.length;
+const pct = x => x == null || isNaN(x) ? "–" : (100 * x).toFixed(1) + "%";
+const wilson = (x, n) => { if (!n) return [NaN, NaN]; const z = 1.96, p = x / n, d = 1 + z * z / n,
+  m = (p + z * z / (2 * n)) / d, h = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d; return [m - h, m + h]; };
+function tel(t, rs = rijen) { let tp = 0, fp = 0, fn = 0; for (const r of rs) { const g = r.s >= t;
+  if (r.y && g) tp++; else if (r.y) fn++; else if (g) fp++; } return {tp, fp, fn}; }
+function bootstrap(t) { const per = D.kaarten.map(k => tel(t, k.aps)), uit = []; let zaad = 7;
+  const rnd = () => (zaad = (zaad * 16807) % 2147483647) / 2147483647;
+  for (let b = 0; b < 2000; b++) { let tp = 0, pos = 0; for (let i = 0; i < nk; i++) { const c = per[Math.floor(rnd() * nk)];
+    tp += c.tp; pos += c.tp + c.fn; } if (pos) uit.push(tp / pos); }
+  uit.sort((a, b) => a - b); return [uit[Math.floor(.025 * uit.length)], uit[Math.floor(.975 * uit.length)]]; }
+const drempels = [...new Set([0, ...rijen.map(r => r.s), 1.0001])].sort((a, b) => b - a);
+const curve = drempels.map(t => { const c = tel(t); return {t, tpr: P ? c.tp / P : 0, fpr: N ? c.fp / N : 0,
+  ppv: c.tp + c.fp ? c.tp / (c.tp + c.fp) : 1}; });
+const auc = curve.slice(1).reduce((s, c, i) => s + (c.fpr - curve[i].fpr) * (c.tpr + curve[i].tpr) / 2, 0);
+const prauc = curve.slice(1).reduce((s, c, i) => s + (c.tpr - curve[i].tpr) * c.ppv, 0);
+const ns = "http://www.w3.org/2000/svg";
+function svg(el, lijnen, punt, as) { el.innerHTML = ""; const X = x => 30 + 260 * x, Y = y => 270 - 260 * y;
+  const add = (tag, at) => { const e = document.createElementNS(ns, tag); for (const k in at) e.setAttribute(k, at[k]); el.appendChild(e); return e; };
+  add("rect", {x: 30, y: 10, width: 260, height: 260, fill: "none", stroke: "var(--lijn)"});
+  for (const v of [0, .5, 1]) { add("text", {x: X(v) - 6, y: 286}).textContent = v; add("text", {x: 4, y: Y(v) + 4}).textContent = v; }
+  add("text", {x: 150, y: 299, "text-anchor": "middle"}).textContent = as[0];
+  for (const [pts, kleur, streep] of lijnen) add("polyline", {points: pts.map(([x, y]) => X(x) + "," + Y(y)).join(" "),
+    fill: "none", stroke: kleur, "stroke-width": 2, "stroke-dasharray": streep || ""});
+  if (punt) add("circle", {cx: X(punt[0]), cy: Y(punt[1]), r: 5, fill: "var(--fout)"}); }
+function teken(t) {
+  const c = tel(t), rec = P ? c.tp / P : NaN, ppv = c.tp + c.fp ? c.tp / (c.tp + c.fp) : NaN, w = wilson(c.tp, P), b = bootstrap(t);
+  const getoond = D.kaarten.map(k => k.aps.filter(r => r.s >= t).length);
+  const plafond = rijen.filter(r => r.y && r.s > 0).length;
+  document.getElementById("dw").textContent = t.toFixed(2);
+  document.getElementById("cijfers").innerHTML = [
+    [pct(rec), `recall (${c.tp}/${P}) · Wilson ${pct(w[0])}–${pct(w[1])}`],
+    [pct(b[0]) + "–" + pct(b[1]), "recall 95%-interval, bootstrap per kaart"],
+    [pct(ppv), `PPV (${c.tp}/${c.tp + c.fp})`],
+    [(c.fp / nk).toFixed(1), `fout-positieven per kaart (${c.fp} totaal)`],
+    [(getoond.reduce((a, b) => a + b, 0) / nk).toFixed(1), `AP's in het rapport per kaart (${Math.min(...getoond)}–${Math.max(...getoond)}, beoordeelde AP's)`],
+    [pct(plafond / P), `plafond: positieven met minstens één kandidaat (${plafond}/${P})`],
+  ].map(([v, l]) => `<div class="cijfer blok"><b>${v}</b><span>${l}</span></div>`).join("");
+  const i = curve.findIndex(x => x.t <= t), hier = curve[Math.max(0, i)];
+  svg(document.getElementById("roc"), [[curve.map(x => [x.fpr, x.tpr]), "var(--acc)"], [[[0, 0], [1, 1]], "var(--lijn)", "4"]], [hier.fpr, hier.tpr], ["fout-positief-fractie", "recall"]);
+  svg(document.getElementById("pr"), [[curve.map(x => [x.tpr, x.ppv]), "var(--acc)"]], [hier.tpr, hier.ppv], ["recall", "PPV"]);
+  const raster = Array.from({length: 101}, (_, j) => j / 100).map(x => { const q = tel(x); return [x, P ? q.tp / P : 0, q.tp + q.fp ? q.tp / (q.tp + q.fp) : 1]; });
+  svg(document.getElementById("rd"), [[raster.map(r => [r[0], r[1]]), "var(--goed)"], [raster.map(r => [r[0], r[2]]), "var(--geel)"],
+    [[[t, 0], [t, 1]], "var(--fout)", "3"]], null, ["drempel"]);
+  const hist = document.getElementById("hist"); hist.innerHTML = "";
+  const bak = [0, 1].map(y => Array.from({length: 10}, (_, b) => rijen.filter(r => r.y === y && r.s > 0 && Math.min(9, Math.floor(r.s * 10)) === b).length));
+  const top = Math.sqrt(Math.max(1, ...bak.flat()));
+  svg(hist, [[[[t, 0], [t, 1]], "var(--fout)", "3"]], null, ["AP-score (zonder score 0)"]);
+  bak.forEach((rij, y) => rij.forEach((n, b) => { const e = document.createElementNS(ns, "rect"), h = 260 * Math.sqrt(n) / top;
+    e.setAttribute("x", 30 + 26 * b + (y ? 2 : 13)); e.setAttribute("width", 11); e.setAttribute("y", 270 - h); e.setAttribute("height", h);
+    e.setAttribute("fill", y ? "var(--goed)" : "var(--geel)"); hist.appendChild(e); }));
+  document.getElementById("tk").innerHTML = "<tr><th>Kaart</th><th>Pos</th><th>TP</th><th>FN</th><th>FP</th><th>In rapport</th><th>Duur</th><th>Massa &lt; 0,9</th><th>Zonder kans</th><th>Fout</th></tr>" +
+    D.kaarten.map(k => { const fn = k.aps.filter(r => r.y && r.s < t), fp = k.aps.filter(r => !r.y && r.s >= t);
+      return `<tr><td>${k.k}</td><td>${k.aps.filter(r => r.y).length}</td><td class="tp">${k.aps.filter(r => r.y && r.s >= t).length}</td>
+      <td class="fn">${fn.map(r => r.id).join(" ")}</td><td class="fp">${fp.map(r => r.id).join(" ")}</td><td>${k.aps.filter(r => r.s >= t).length}</td>
+      <td>${k.duur ? Math.round(k.duur / 60) + " min" : "–"}</td><td>${k.massa_laag}</td><td>${k.zonder_kans}</td><td>${k.fout.join(" ")}</td></tr>`; }).join("");
+  const perAp = {}; for (const r of rijen) { const a = perAp[r.id] ||= {id: r.id, label: r.label, cat: r.cat, modus: r.modus, pos: 0, tp: 0, fn: [], fp: [], s: []};
+    if (r.y) { a.pos++; if (r.s >= t) a.tp++; else a.fn.push(r.k); } else if (r.s >= t) a.fp.push(r.k); }
+  document.getElementById("ta").innerHTML = "<tr><th>AP</th><th>Aandachtspunt</th><th>Modus</th><th>Pos</th><th>Gevonden</th><th>FN (kaart)</th><th>FP (kaart)</th></tr>" +
+    Object.values(perAp).filter(a => a.pos || a.fp.length).sort((a, b) => b.fn.length - a.fn.length || b.fp.length - a.fp.length || a.id.localeCompare(b.id))
+      .map(a => `<tr><td>${a.id}</td><td>${a.label}</td><td>${a.modus}</td><td>${a.pos}</td><td>${a.tp}</td><td class="fn">${a.fn.join(" ")}</td><td class="fp">${a.fp.join(" ")}</td></tr>`).join("");
+  if (rijen.some(r => r.p)) document.getElementById("detail").innerHTML = "<h2>Missers en fout-positieven met passages</h2>" +
+    rijen.filter(r => (r.y && r.s < t) || (!r.y && r.s >= t)).map(r => `<details class="blok"><summary><span class="${r.y ? "fn" : "fp"}">${r.y ? "FN" : "FP"}</span>
+      kaart ${r.k} · ${r.id} ${r.label}</summary>${(r.p || []).map(([tx, k]) => `<div class="pas"><i>${k == null ? "–" : k.toFixed(3)}</i> ${tx.replace(/</g, "&lt;")}</div>`).join("") || '<div class="pas mut">geen kandidaten</div>'}</details>`).join("");
+}
+const versies = Object.entries(D.versies);
+document.getElementById("kop").textContent = `${nk} kaarten · ${rijen.length} beoordeelde AP's · ${P} positief · ROC-AUC ${auc.toFixed(3)} · ` +
+  (versies.length === 1 ? `config-hash ${versies[0][0]}` : `LET OP: ${versies.length} verschillende config-hashes`);
+document.getElementById("auc").textContent = "AUC " + auc.toFixed(3);
+document.getElementById("prauc").textContent = "AUC " + prauc.toFixed(3);
+const s = document.getElementById("d"), start = parseFloat(D.drempel_meta[0] || "0.3");
+document.getElementById("dm").textContent = D.drempel_meta.length ? `(drempel van de run: ${D.drempel_meta.join(", ")})` : "";
+s.value = start; s.oninput = () => teken(parseFloat(s.value)); teken(start);
+</script>
+</body>
+</html>

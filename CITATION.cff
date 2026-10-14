@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "Als je deze software of de resultaten gebruikt in een publicatie, citeer haar dan zo."
+title: "ZwangerenkaartAI: letterlijke passages per aandachtspunt uit de verloskundige zwangerenkaart"
+type: software
+authors:
+  - given-names: Pieter-Kees
+    family-names: Groot
+    name-particle: de
+    affiliation: Spaarne Gasthuis
+  - given-names: Andreas
+    family-names: Viruly
+    affiliation: Spaarne Gasthuis
+  - given-names: Bart
+    family-names: Voskamp
+    affiliation: Spaarne Gasthuis
+  - given-names: Wouter
+    family-names: Huijbers
+    affiliation: Spaarne Gasthuis
+  - given-names: Diederik
+    family-names: Feilzer
+    affiliation: Spaarne Gasthuis
+repository-code: "https://github.com/Andymaarten/ZwangerenkaartAI"
+url: "https://andymaarten.github.io/ZwangerenkaartAI/"
+date-released: "2026-10-16"
+keywords: [obstetrics, large language model, clinical documentation, MedGemma, validation]

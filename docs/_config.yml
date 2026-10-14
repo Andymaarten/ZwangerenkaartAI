@@ -1,0 +1,10 @@
+title: ZwangerenkaartAI
+lang: nl
+markdown: kramdown
+kramdown:
+  input: GFM
+  auto_ids: true
+defaults:
+  - scope: { path: "" }
+    values: { layout: default }
+exclude: [resultaten/README.md]

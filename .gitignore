@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+docs/_site/
+
+# Nooit patiëntgegevens
+*.pdf
+*_results.json
+*_rapport*.md
+passages.csv
+*met_passages*
+analyse_server*.html

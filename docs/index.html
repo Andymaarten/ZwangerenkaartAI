@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZwangerenkaartAI</title>
+<meta name="description" content="ZwangerenkaartAI zet een verloskundige zwangerenkaart lokaal om in een overzicht met letterlijke passages per aandachtspunt. Methode, validatieprotocol en resultaten.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>ZwangerenkaartAI</h1>
+    <p class="tagline">Een lokaal taalmodel dat per aandachtspunt de letterlijke passages uit een verloskundige zwangerenkaart toont, zodat de zorgverlener ze sneller vindt en zelf beoordeelt.</p>
+
+    <p class="authors">
+      <span><a href="https://www.spaarnegasthuis.nl/specialisten/pieter-kees-de-groot" rel="noopener">Pieter-Kees de Groot</a></span>
+      <span><a href="https://www.linkedin.com/in/andreasviruly/" rel="noopener">Andreas Viruly</a></span>
+      <span><a href="https://www.spaarnegasthuis.nl/specialisten/bart-voskamp" rel="noopener">Bart Voskamp</a></span>
+      <span><a href="https://www.linkedin.com/in/wouter-huijbers-29071614a/" rel="noopener">Wouter Huijbers</a></span>
+      <span><a href="https://www.linkedin.com/in/diederikfeilzer/" rel="noopener">Diederik Feilzer</a></span>
+    </p>
+    <p class="affils">Spaarne Gasthuis · MSCK</p>
+
+
+    <nav class="buttons" aria-label="Snelkoppelingen">
+      <a class="btn" href="https://github.com/Andymaarten/ZwangerenkaartAI">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub</a>
+      <a class="btn" href="methode.html">Methode</a>
+      <a class="btn" href="validatieprotocol.html">Validatieprotocol</a>
+      <a class="btn" href="#resultaten">Resultaten</a>
+    </nav>
+
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="abstract-section" style="border-top:0;padding-top:0">
+    <div class="abstract" lang="en">
+      <h2>Summary</h2>
+      <p>ZwangerenkaartAI converts a Dutch obstetric record (<em>zwangerenkaart</em>, PDF) into a structured overview for the clinician. For each of 88 predefined points of attention it shows only verbatim passages from the record, without a verdict or score; the clinician makes every judgement. It runs fully on-premises with an open model (MedGemma 27B) in Docker, and no patient data leaves the hospital. The code, method, validation protocol and aggregated results are published here. A prospective validation on new records is in progress.</p>
+    </div>
+  </section>
+
+  <section id="wat">
+    <h2>Wat het doet</h2>
+    <p>Een zwangerenkaart is vaak tientallen pagina's lang: consulten, echo's, lab, brieven van eerdere bevallingen. Wie een zorgplan opstelt, moet daarin per patiënt nagaan welke aandachtspunten spelen. ZwangerenkaartAI leest de kaart en zet per aandachtspunt de passages die erover gaan op een rij.</p>
+    <div class="grid3">
+      <div class="card">
+        <h3>Invoer</h3>
+        <p>De zwangerenkaart als PDF, geëxporteerd uit het systeem van de praktijk of het ziekenhuis.</p>
+      </div>
+      <div class="card">
+        <h3>Uitvoer</h3>
+        <ul>
+          <li>patiëntgegevens (naam, geboortedatum, enzovoort)</li>
+          <li>88 aandachtspunten, elk met letterlijke quotes uit de zwangerenkaart</li>
+          <li>medische gegevens (vorige zwangerschappen, echo's, voorgeschiedenis, allergieën, medicatie)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Wat het niet doet</h3>
+        <ul>
+          <li>geen diagnose, risicoscore of advies</li>
+          <li>geen ja/nee per aandachtspunt</li>
+          <li>vervangt de kaart en het oordeel van de zorgverlener niet</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="hoe">
+    <h2>Hoe het werkt</h2>
+    <p>De kaart wordt lokaal omgezet naar tekst. Per aandachtspunt zoekt het systeem dan kandidaat-passages en houdt alleen de passages over die letterlijk in de kaart staan en over het onderwerp gaan. Waar een aandachtspunt van één meetbare waarde afhangt (bijvoorbeeld BMI, leeftijd, rhesus, Hb), doet Python deterministisch het werk en komt er geen taalmodel aan te pas.</p>
+
+    <figure>
+      <div class="fig">
+        <svg viewBox="0 0 760 410" role="img" aria-labelledby="pijplijn-titel pijplijn-desc" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+          <title id="pijplijn-titel">Pijplijn per aandachtspunt</title>
+          <desc id="pijplijn-desc">Van PDF naar tekst. Per aandachtspunt: een Python-regel voor meetbare waarden, of anders focuspassages, call 1 met letterlijke citaten, een harde controle, een Python-filter en call 2 die passages verwijdert die niet bijdragen aan het aandachtspunt. De overgebleven passages komen in het rapport.</desc>
+          <defs>
+            <marker id="pijl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+            </marker>
+          </defs>
+          <style>
+            .b { stroke-width: 1.4; rx: 8; }
+            .py { fill: var(--python-soft); stroke: var(--python); }
+            .md { fill: var(--model-soft); stroke: var(--model); }
+            .nt { fill: var(--surface-2); stroke: var(--border); }
+            .t { fill: var(--text); font-size: 14px; font-weight: 600; }
+            .s { fill: var(--muted); font-size: 12px; }
+            .ln { stroke: var(--muted); stroke-width: 1.4; fill: none; marker-end: url(#pijl); }
+            .dash { stroke-dasharray: 4 4; }
+          </style>
+
+          <!-- PDF -> tekst -->
+          <rect class="b nt" x="20" y="20" width="170" height="54"/>
+          <text class="t" x="105" y="43" text-anchor="middle">PDF → tekst</text>
+          <text class="s" x="105" y="61" text-anchor="middle">lokaal, met tabelherstel</text>
+          <path class="ln" d="M190,47 H240"/>
+
+          <!-- per AP -->
+          <text class="s" x="250" y="14">per aandachtspunt (88×)</text>
+          <rect x="242" y="20" width="498" height="330" rx="12" fill="none" stroke="var(--border)" stroke-dasharray="5 5"/>
+
+          <!-- Python-regel -->
+          <rect class="b py" x="262" y="34" width="210" height="54"/>
+          <text class="t" x="367" y="57" text-anchor="middle">Python-regel</text>
+          <text class="s" x="367" y="75" text-anchor="middle">BMI, leeftijd, rhesus, Hb, …</text>
+          <path class="ln" d="M472,61 H700 V286"/>
+          <text class="s" x="560" y="54">waarde bepaald</text>
+          <path class="ln dash" d="M367,88 V112"/>
+          <text class="s" x="375" y="106">niet te bepalen</text>
+
+          <!-- Focuspassages -->
+          <rect class="b py" x="262" y="114" width="210" height="50"/>
+          <text class="t" x="367" y="135" text-anchor="middle">Focuspassages</text>
+          <text class="s" x="367" y="152" text-anchor="middle">kaartregels met zoekwoorden</text>
+          <path class="ln" d="M367,164 V184"/>
+
+          <!-- Call 1 -->
+          <rect class="b md" x="262" y="186" width="210" height="50"/>
+          <text class="t" x="367" y="207" text-anchor="middle">Call 1</text>
+          <text class="s" x="367" y="224" text-anchor="middle">argumenten + letterlijke citaten</text>
+          <path class="ln" d="M367,236 V256"/>
+
+          <!-- Harde controle -->
+          <rect class="b py" x="262" y="258" width="210" height="50"/>
+          <text class="t" x="367" y="279" text-anchor="middle">Harde controle + filter</text>
+          <text class="s" x="367" y="296" text-anchor="middle">staat het citaat letterlijk in de kaart?</text>
+          <path class="ln" d="M472,283 H502"/>
+
+          <!-- Call 2 -->
+          <rect class="b md" x="504" y="250" width="160" height="66"/>
+          <text class="t" x="584" y="272" text-anchor="middle">Call 2</text>
+          <text class="s" x="584" y="290" text-anchor="middle">verwijdert passages die</text>
+          <text class="s" x="584" y="305" text-anchor="middle">niet bijdragen</text>
+          <path class="ln" d="M664,283 H682"/>
+          
+
+          <!-- Rapport -->
+          <rect class="b nt" x="560" y="362" width="180" height="40"/>
+          <text class="t" x="650" y="387" text-anchor="middle">Rapport</text>
+          <path class="ln" d="M700,300 V360"/>
+          <rect class="b nt" x="684" y="268" width="32" height="32" rx="16"/>
+          <text class="s" x="700" y="288" text-anchor="middle">∪</text>
+
+        </svg>
+      </div>
+      <figcaption>Figuur 1. Pijplijn per aandachtspunt. Elk citaat wordt teruggezocht in de kaarttekst; een citaat dat er niet letterlijk in staat, valt weg. In het rapport staat altijd de echte kaarttekst.</figcaption>
+      <div class="legend">
+        <span><i style="background:var(--python-soft);border:1px solid var(--python)"></i>Python (deterministisch)</span>
+        <span><i style="background:var(--model-soft);border:1px solid var(--model)"></i>Taalmodel (MedGemma 27B, lokaal)</span>
+      </div>
+    </figure>
+    <p class="small">Details, prompts en ontwerpkeuzes: <a href="methode.html">Methode</a>.</p>
+  </section>
+
+
+  <section id="resultaten">
+    <h2>Resultaten</h2>
+
+    <h3><span class="label dev">Ontwikkelset</span></h3>
+    <p>Kaarten die tijdens de ontwikkeling zijn gebruikt. Dit zijn daarom geen validatieresultaten. Eenheid: aandachtspunt per kaart, vergeleken met de gouden standaard. Correcties in de gouden standaard zijn in het bestand gemarkeerd met de oorspronkelijke waarde.</p>
+
+    <div id="dev-resultaten">
+      <div class="placeholder">De cijfers van de ontwikkelset volgen.</div>
+    </div>
+
+    <h3><span class="label val">Validatieset</span>&nbsp; gepland</h3>
+    <p>Minimaal 40 nieuwe kaarten, niet gebruikt tijdens de ontwikkeling, op een vooraf bevroren versie. Het protocol is vóór de run gepubliceerd. De resultaten komen hier, ook als ze tegenvallen.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Code</th><th>Beoordeling per aandachtspunt per kaart</th><th>Wanneer</th></tr></thead>
+        <tbody>
+          <tr><td class="code">ZP</td><td>Zorgplan zoals in de huidige praktijk opgesteld</td><td>vooraf</td></tr>
+          <tr><td class="code">E0</td><td>Eerste oordeel van de experts, zonder uitvoer van het systeem en zonder zorgplan</td><td>vastgelegd vóór inzage</td></tr>
+          <tr><td class="code">M</td><td>Systeem: passages getoond of niet</td><td>validatierun</td></tr>
+          <tr><td class="code">E1</td><td>Gouden standaard: oordeel van de experts na inzage van de passages en het zorgplan, met reden per wijziging</td><td>na de run</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ol class="steps">
+      <li><strong>Primaire uitkomst:</strong> recall van het systeem ten opzichte van de gouden standaard (E1), met 95%-betrouwbaarheidsinterval en een vooraf vastgelegde ondergrens. Omdat E1 na inzage van het systeem tot stand komt, wordt de recall ten opzichte van het blinde oordeel (E0) ernaast gerapporteerd.</li>
+      <li><strong>Systeem en huidige praktijk:</strong> recall van systeem en zorgplan, beide ten opzichte van E1.</li>
+      <li><strong>Aanvullende signalering:</strong> aandachtspunten die in E0 (en in ZP) ontbraken, waarvoor het systeem passages toonde en die de expert na inzage bevestigde, per 100 kaarten. Wijzigingen in omgekeerde richting worden ook gerapporteerd.</li>
+      <li><strong>Secundair:</strong> PPV, fout-positieven per kaart, aandachtspunten per rapport, ROC- en PR-AUC, en de prestaties ten opzichte van E0.</li>
+    </ol>
+    <p class="small">Volledig protocol: <a href="validatieprotocol.html">Validatieprotocol</a>. Welke versie bij welke resultaten hoort: <a href="versies.html">Versies</a>.</p>
+  </section>
+
+  <section id="nareken">
+    <h2>Zelf narekenen</h2>
+    <p>De gouden standaard (kaartnummer, aandachtspunt, 0/1) en het analysescript staan in de repository. Met de resultaatbestanden van een run, die reviewers op aanvraag kunnen krijgen, maakt het script dezelfde tabellen en figuren, zonder kaarttekst. De broncode, prompts en definities zijn niet openbaar en op aanvraag beschikbaar voor reviewers.</p>
+    <pre><code>python3 tools/analyse.py &lt;map met results.json&gt; docs/resultaten/gouden_standaard_ontwikkelset.csv -o analyse.html</code></pre>
+  </section>
+
+  <section id="privacy">
+    <h2>Privacy en veiligheid</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>Lokaal</h3>
+        <ul>
+          <li>Het model draait op een server binnen het ziekenhuis (Docker, Ollama of vLLM).</li>
+          <li>Geen patiëntgegevens naar externe diensten.</li>
+          <li>Elke modelaanroep is zelfstandig, zonder gespreksgeheugen.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Herleidbaar</h3>
+        <ul>
+          <li>Alleen passages die letterlijk in de kaart staan.</li>
+          <li>Elke uitvoer bevat de code-versie, een hash van prompts en instellingen, en een hash van de kaart.</li>
+          <li>Deze repository en pagina bevatten geen patiëntgegevens.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="small" style="margin-top:1rem">Beoogd gebruik, classificatie en gegevensverwerking: <a href="mdr-en-privacy.html">MDR en privacy</a>.</p>
+  </section>
+
+  <section id="beperkingen">
+    <h2>Beperkingen</h2>
+    <ul>
+      <li>Alle kaarten komen uit één ziekenhuis. Het systeem werkt op platte tekst, zodat de opmaak van een kaart mag verschillen; de meest gangbare kaartformaten in Nederland zijn getest.</li>
+      <li>De gouden standaard is een expertoordeel dat na inzage van het systeem tot stand komt. Daarom scoort de gynaecoloog eerst blind, staat de recall tegen dat blinde oordeel ernaast en controleert een tweede gynaecoloog de toegevoegde aandachtspunten.</li>
+      <li>Zeldzame aandachtspunten komen weinig voor. Elke misser wordt afzonderlijk geanalyseerd en de kwartaalcontroles na ingebruikname lopen door.</li>
+      <li>Definities veranderen mee met richtlijnen. Ze staan in een aparte repository; na een wijziging worden ontwikkel- en validatieset opnieuw gedraaid.</li>
+    </ul>
+    <p class="small">Uitgebreider: <a href="beperkingen.html">Beperkingen</a>.</p>
+  </section>
+
+  <section id="team">
+    <h2>Team</h2>
+    <div class="team">
+      <div class="person"><div class="n"><a href="https://www.spaarnegasthuis.nl/specialisten/pieter-kees-de-groot" rel="noopener">Pieter-Kees de Groot</a></div><div class="r">Gynaecoloog, projectleider</div></div>
+      <div class="person"><div class="n"><a href="https://www.linkedin.com/in/andreasviruly/" rel="noopener">Andreas Viruly</a></div><div class="r">Arts, technisch lead en strategie</div></div>
+      <div class="person"><div class="n"><a href="https://www.spaarnegasthuis.nl/specialisten/bart-voskamp" rel="noopener">Bart Voskamp</a></div><div class="r">Gynaecoloog, implementatie en kennisverspreiding</div></div>
+      <div class="person"><div class="n"><a href="https://www.linkedin.com/in/wouter-huijbers-29071614a/" rel="noopener">Wouter Huijbers</a></div><div class="r">Arts, technische ontwikkeling</div></div>
+      <div class="person"><div class="n"><a href="https://www.linkedin.com/in/diederikfeilzer/" rel="noopener">Diederik Feilzer</a></div><div class="r">Klinisch fysicus in opleiding, technische ontwikkeling</div></div>
+    </div>
+    <p class="small" style="margin-top:.8rem">Spaarne Gasthuis · MSCK</p>
+  </section>
+
+
+  <section id="citeren">
+    <h2>Citeren</h2>
+    <button class="copy" type="button" data-copy="bibtex">Kopieer</button>
+    <pre id="bibtex">@software{zwangerenkaartai_2026,
+  title  = {ZwangerenkaartAI: letterlijke passages per aandachtspunt uit de verloskundige zwangerenkaart},
+  author = {de Groot, Pieter-Kees and Viruly, Andreas and Voskamp, Bart and Huijbers, Wouter and Feilzer, Diederik},
+  year   = {2026},
+  url    = {https://github.com/Andymaarten/ZwangerenkaartAI}
+}</pre>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>© 2026 de auteurs. Alle rechten voorbehouden. De code is openbaar ter inzage; gebruik of hergebruik alleen met schriftelijke toestemming. Niet bedoeld voor klinisch gebruik buiten de validatieomgeving.</p>
+    <p>Deze pagina gebruikt geen cookies, trackers of externe lettertypen. &nbsp; <button class="theme-toggle" type="button" id="theme">Licht/donker</button></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  try { var t = localStorage.getItem('theme'); if (t) root.setAttribute('data-theme', t); } catch (e) {}
+  document.getElementById('theme').addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  });
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var txt = document.getElementById(b.getAttribute('data-copy')).textContent;
+      if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () {
+        b.textContent = 'Gekopieerd'; setTimeout(function () { b.textContent = 'Kopieer'; }, 1500);
+      });
+    });
+  });
+})();
+
+// Resultaten ontwikkelset: resultaten/ontwikkelset.json is de data uit tools/analyse.py (zonder kaarttekst).
+(function () {
+  var doel = document.getElementById('dev-resultaten');
+  fetch('resultaten/ontwikkelset.json').then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (D) {
+    var rijen = [];
+    D.kaarten.forEach(function (k) { k.aps.forEach(function (a) { rijen.push({k: k.k, s: a.s, y: a.y}); }); });
+    var nk = D.kaarten.length, P = rijen.filter(function (r) { return r.y; }).length, N = rijen.length - P;
+    var t = parseFloat((D.drempel_meta || [])[0] || '0.3');
+    function tel(rs) { var c = {tp: 0, fp: 0, fn: 0}; rs.forEach(function (r) { var g = r.s >= t;
+      if (r.y && g) c.tp++; else if (r.y) c.fn++; else if (g) c.fp++; }); return c; }
+    function wilson(x, n) { var z = 1.96, p = x / n, d = 1 + z * z / n, m = (p + z * z / (2 * n)) / d,
+      h = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d; return [m - h, Math.min(1, m + h)]; }
+    var c = tel(rijen), rec = c.tp / P, ppv = c.tp / (c.tp + c.fp), wr = wilson(c.tp, P), wp = wilson(c.tp, c.tp + c.fp);
+    var drempels = Array.from(new Set([0].concat(rijen.map(function (r) { return r.s; }), [1.0001]))).sort(function (a, b) { return b - a; });
+    var curve = drempels.map(function (d) { var tp = 0, fp = 0; rijen.forEach(function (r) { if (r.s >= d) { if (r.y) tp++; else fp++; } });
+      return {tpr: tp / P, fpr: fp / N, ppv: tp + fp ? tp / (tp + fp) : 1}; });
+    var auc = 0, prauc = 0;
+    for (var i = 1; i < curve.length; i++) { auc += (curve[i].fpr - curve[i - 1].fpr) * (curve[i].tpr + curve[i - 1].tpr) / 2;
+      prauc += (curve[i].tpr - curve[i - 1].tpr) * curve[i].ppv; }
+    var pct = function (x) { return (100 * x).toFixed(1).replace('.', ',') + '%'; };
+    var nl = function (x, d) { return x.toFixed(d).replace('.', ','); };
+    var hier = {tpr: rec, fpr: c.fp / N, ppv: ppv};
+    function grafiek(lijnen, punt, asx, asy) {
+      var X = function (x) { return 46 + 240 * x; }, Y = function (y) { return 252 - 240 * y; };
+      var s = '<svg viewBox="0 0 300 300" role="img"><rect x="46" y="12" width="240" height="240" fill="none" stroke="var(--border)"/>';
+      [0, .5, 1].forEach(function (v) { s += '<text x="' + X(v) + '" y="268" text-anchor="middle">' + nl(v, v % 1 ? 1 : 0) + '</text><text x="40" y="' + (Y(v) + 4) + '" text-anchor="end">' + nl(v, v % 1 ? 1 : 0) + '</text>'; });
+      s += '<text x="166" y="290" text-anchor="middle">' + asx + '</text>';
+      s += '<text transform="translate(12,132) rotate(-90)" text-anchor="middle" x="0" y="0">' + asy + '</text>';
+      lijnen.forEach(function (l) { s += '<polyline fill="none" stroke="' + l[1] + '" stroke-width="2" stroke-dasharray="' + (l[2] || '') + '" points="' +
+        l[0].map(function (p) { return X(p[0]) + ',' + Y(p[1]); }).join(' ') + '"/>'; });
+      if (punt) s += '<circle cx="' + X(punt[0]) + '" cy="' + Y(punt[1]) + '" r="5" fill="var(--warn)"/>';
+      return s + '</svg>';
+    }
+    doel.innerHTML =
+      '<div class="stats">' +
+      '<div class="stat"><div class="k">Recall</div><div class="v">' + pct(rec) + '</div><div class="ci">' + c.tp + '/' + P + ' · 95%-BI ' + Math.round(100 * wr[0]) + '–' + Math.round(100 * wr[1]) + '</div></div>' +
+      '<div class="stat"><div class="k">PPV</div><div class="v">' + pct(ppv) + '</div><div class="ci">' + c.tp + '/' + (c.tp + c.fp) + ' · 95%-BI ' + Math.round(100 * wp[0]) + '–' + Math.round(100 * wp[1]) + '</div></div>' +
+      '<div class="stat"><div class="k">Fout-positief per kaart</div><div class="v">' + nl(c.fp / nk, 1) + '</div><div class="ci">' + c.fp + ' over ' + nk + ' kaarten</div></div>' +
+      '<div class="stat"><div class="k">ROC-AUC</div><div class="v">' + nl(auc, 3) + '</div><div class="ci">PR-AUC ' + nl(prauc, 3) + '</div></div>' +
+      '</div>' +
+      '<p class="small">' + nk + ' kaarten, ' + rijen.length + ' beoordeelde aandachtspunten, waarvan ' + P + ' positief volgens de gouden standaard. 95%-betrouwbaarheidsintervallen volgens Wilson.</p>' +
+      '<div class="charts">' +
+      '<figure class="chart"><h4>ROC-curve <span>· AUC ' + nl(auc, 3) + '</span></h4>' +
+        grafiek([[curve.map(function (q) { return [q.fpr, q.tpr]; }), 'var(--accent)'], [[[0, 0], [1, 1]], 'var(--border)', '4']], [hier.fpr, hier.tpr], 'fout-positief-fractie', 'recall') + '</figure>' +
+      '<figure class="chart"><h4>Precision-recall-curve <span>· AUC ' + nl(prauc, 3) + '</span></h4>' +
+        grafiek([[curve.map(function (q) { return [q.tpr, q.ppv]; }), 'var(--accent)']], [hier.tpr, hier.ppv], 'recall', 'PPV') + '</figure>' +
+      '</div><p class="small">De oranje stip is het werkpunt van het systeem zoals het draait.</p>';
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>
