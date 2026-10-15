@@ -30,10 +30,10 @@ De versie wordt bevroren vóór de run en verandert daarna niet.
 
 | Onderdeel | Waarde |
 |---|---|
-| Code (git-tag en commit) | `v3-ontwikkelset-20261014` · `eaa82da` [bevestigen na drempelcontrole] |
-| Vragen en aandachtspunten (`questions/`, commit) | `b54abef` · `aandachtspunten.json` versie 5.2 |
-| Docker-image (digest) | `andymaarten/zorgplan:v3-ontwikkelset-20261014` · `sha256:dde28ca449cbf50aac97344c3e6d1f3914039113d59128596450dc5568e3ffb7` |
-| Config-hash (code, prompts, aandachtspunten, vragenlijst, drempel, model) | `b417a8436c68` bij modelnaam `medgemma`; heet het model op de server anders, dan geldt de hash uit het eerste serverrapport `[ ]` |
+| Code (git-tag en commit) | `v3-ontwikkelset-20261015` · `bb75928` (laatste ontwikkelrun 15→16 okt; bevestigen na die run) |
+| Vragen en aandachtspunten (`questions/`, commit) | `a99f061` · `aandachtspunten.json` versie 5.5 |
+| Docker-image (digest) | `andymaarten/zorgplan:v3-ontwikkelset-20261015` · `sha256:b6238e45ce4bf55de0132e14a75a148703eefbe3a74fd7dca635b065dafa720a` |
+| Config-hash (code, prompts, aandachtspunten, vragenlijst, drempel, model) | `c31db1d8ba93` bij modelnaam `medgemma`; heet het model op de server anders, dan geldt de hash uit het eerste serverrapport `[ ]` |
 | Model | medgemma 27B, kwantisatie Q8_0, via Ollama, op de server van het Spaarne Gasthuis |
 | Drempel call 2 | `[0,3]`: vóór de freeze gecontroleerd op de ontwikkelset, gedraaid met deze versie op de server (Q8). Gekozen als de hoogste drempel waarbij de recall daar ≥ 95% is. Wordt tijdens de validatie niet aangepast. |
 | Git-sync van `questions/` tijdens de run | uit (`GIT_SYNC_QUESTIONS=0` in de `.env` van de server; waarde vastleggen) |
@@ -103,6 +103,11 @@ Per kaart en per aandachtspunt worden vier beoordelingen vastgelegd (0 = niet va
    zwangerenkaart (bijvoorbeeld informatie uit het consult), krijgt de aantekening "niet in de kaart" en telt niet mee
    voor de vergelijkingen. Het aantal wordt gerapporteerd.
 7. **AP079 (kwetsbaarheden)** telt niet mee voor de primaire uitkomst en wordt apart beschreven.
+8. **Samengestelde aandachtspunten** (risicofactoren voor pre-eclampsie, diabetes gravidarum en trombose): het
+   aandachtspunt is 1 als minstens één factor uit de factorlijst van de bevroren versie in de kaart staat ("methode A",
+   vastgelegd 15-10-2026). Of de combinatie van factoren een indicatie geeft, beoordeelt de zorgverlener; dat wordt
+   niet gescoord. De gouden standaard van de ontwikkelset is op 15-10-2026 volgens deze regel herscoord (27 regels; de
+   reden staat per regel in de kolom `opmerking`).
 
 ## 5. Primaire uitkomst
 

@@ -58,11 +58,20 @@ Gasthuis.
 
 Per aandachtspunt:
 
-1. **Python-regel.** Hangt een aandachtspunt af van één meetbare waarde (bijvoorbeeld BMI, leeftijd op de à terme
-   datum, rhesus, Hb, ferritine, trombocyten), dan leest Python die waarde uit de kaart en past de regel uit het bestand
-   toe, bijvoorbeeld `bmi >= 30 en < 35`. Er komt geen taalmodel aan te pas. Labwaarden tellen alleen uit de huidige
-   zwangerschap en binnen een plausibel bereik. Kan Python de waarde niet vinden, dan gaat het aandachtspunt door de
-   stappen hieronder.
+1. **Python-laag en poorten.** Eerst leest Python vaste waarden uit de kaart: BMI, leeftijd op de à terme datum,
+   pariteit (G/P-notatie), rhesus D en c, HIV, HBsAg, Hb, ferritine, trombocyten en het interval sinds de vorige
+   bevalling. Labwaarden en BMI tellen alleen uit de huidige zwangerschap; grenswaarden uit protocolteksten
+   ("BMI > 35") tellen niet als meting. Geven meerdere metingen verschillende uitkomsten, of is een waarde niet zeker
+   te bepalen, dan gebruikt Python hem niet. Daarna per aandachtspunt, volgens regels in het definitiebestand:
+   - **AP gevuld met een gevonden waarde.** Hangt het aandachtspunt van één meetbare waarde af (bijvoorbeeld
+     maternale leeftijd > 40 jaar), dan beslist Python. Er komt geen taalmodel aan te pas; de passage is de
+     letterlijke regel uit de kaart.
+   - **Poort dicht: het AP hoeft niet gecontroleerd te worden.** Bijvoorbeeld "bariatrische chirurgie bij BMI ≥ 40" is
+     niet relevant bij een BMI van 22. Een poort gaat alleen dicht als Python de waarde zeker weet.
+   - **Poort open: het AP wordt gecontroleerd door het taalmodel.** Bij twijfel altijd deze kant op.
+   - **Python-factor.** Bij samengestelde aandachtspunten (risicofactoren) voegt Python meetbare factoren toe als
+     letterlijke passage, bijvoorbeeld nullipariteit (para 0), leeftijd ≥ 40 of BMI > 35 bij de risicofactoren voor
+     pre-eclampsie. Python voegt alleen toe en haalt nooit iets weg.
 2. **Focuspassages.** Kaartregels met een van de zoekwoorden van het aandachtspunt. Ze dienen als hint voor het model
    en als extra kandidaten, zodat een korte regel als "Zorgpad sectio ia" niet gemist wordt.
 3. **Call 1.** Het model leest de hele kaart en geeft letterlijke citaten uit de zwangerenkaart terug, elk met een korte
@@ -70,15 +79,18 @@ Per aandachtspunt:
 4. **Harde controle.** Elk citaat wordt teruggezocht in de kaarttekst. Kleine verschillen in hoofdletters, leestekens
    en regelafbrekingen zijn toegestaan; wat niet in de kaart te vinden is, valt weg. Vanaf hier wordt altijd de echte
    kaarttekst gebruikt, nooit de tekst zoals het model hem schreef.
-5. **Python-filter.** Ontkenningen ("rookt niet"), lege velden, kale labkoppen en passages over partner of familie
-   vallen weg, behalve bij aandachtspunten waar de familieanamnese meetelt.
+5. **Python-filter.** Ontkenningen ("rookt niet"), lege velden, kale labkoppen zonder uitslag en passages over partner
+   of familie vallen weg, behalve bij aandachtspunten waar de familieanamnese meetelt. Familie van de partner valt
+   altijd weg.
 6. **Call 2.** Per overgebleven quote gaat het systeem na of die aannemelijk bijdraagt aan het aandachtspunt. Het
    stelt die vraag aan het model en bepaalt uit de logprobs de kans op *ja* tegenover *nee*. De drempel voor die kans
    staat bewust laag, zodat de sensitiviteit hoog blijft: alleen quotes die duidelijk niet relevant zijn, worden
    weggefilterd. Bij samengestelde aandachtspunten (zoals risicofactoren voor pre-eclampsie) is de vraag of de quote een
    risicofactor is. Elke quote krijgt context mee: bij een kort citaat de zin eromheen, de regel erboven en de
    dichtstbijzijnde datum. De vraag noemt ook het begin van de huidige zwangerschap, zodat het model een brief over een
-   eerdere bevalling herkent.
+   eerdere bevalling herkent, en de waarden die Python zeker uit de kaart haalde (BMI, leeftijd, pariteit,
+   interval), zodat het model een grens in de definitie ("BMI > 35", "≥ 40 jaar") niet zelf hoeft te toetsen. Die
+   waarden staan alleen in de vraag aan het model, nooit in het rapport.
 7. **Rapport.** Per categorie een tabel met één regel per aandachtspunt waarvoor passages zijn gevonden. In de tabel
    staan de twee belangrijkste quotes, letterlijk uit de kaart; zijn er meer, dan staat erbij hoeveel. Bijna gelijke
    passages staan er één keer in. In een bijlage staan per aandachtspunt alle passages als hele zin uit de kaart,

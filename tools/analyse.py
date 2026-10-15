@@ -89,8 +89,11 @@ def schrijf(data: Dict[str, Any], uit: Path, met_passages: bool) -> None:
 
 
 def bijwerken(map_: Path, gs_pad: Path, uit: Path) -> str:
-    """Voor de pijplijn: na elke kaart de analyse over alle resultaten opnieuw, zonder passages. Geeft een samenvatting."""
-    data = lees(map_, gouden_standaard(gs_pad), False)
+    """Voor de pijplijn: na elke kaart de analyse over alle resultaten opnieuw: <uit> zonder passages (deelbaar) en
+    <uit>_met_passages.html + passages.csv met kaarttekst (alleen lokaal, patiëntgegevens). Geeft een samenvatting."""
+    gs = gouden_standaard(gs_pad)
+    schrijf(lees(map_, gs, True), uit.with_name(uit.stem + "_met_passages.html"), True)
+    data = lees(map_, gs, False)
     schrijf(data, uit, False)
     rijen = [r for k in data["kaarten"] for r in k["aps"]]
     pos = [r for r in rijen if r["y"]]
