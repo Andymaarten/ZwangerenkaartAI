@@ -32,7 +32,7 @@ De versie wordt bevroren vóór de run en verandert daarna niet.
 |---|---|
 | Code (git-tag en commit) | `v3-ontwikkelset-20261015` · `bb75928` (laatste ontwikkelrun 15→16 okt; bevestigen na die run) |
 | Vragen en aandachtspunten (`questions/`, commit) | `a99f061` · `aandachtspunten.json` versie 5.5 |
-| Docker-image (digest) | `andymaarten/zorgplan:v3-ontwikkelset-20261015` · `sha256:b6238e45ce4bf55de0132e14a75a148703eefbe3a74fd7dca635b065dafa720a` |
+| Docker-image (digest) | `andymaarten/zorgplan:v3-ontwikkelset-20261015` · `sha256:02a566777d1fedff41d98fb8c55e625210a9150b30e54b14d05b72d5b5ba5907` |
 | Config-hash (code, prompts, aandachtspunten, vragenlijst, drempel, model) | `c31db1d8ba93` bij modelnaam `medgemma`; heet het model op de server anders, dan geldt de hash uit het eerste serverrapport `[ ]` |
 | Model | medgemma 27B, kwantisatie Q8_0, via Ollama, op de server van het Spaarne Gasthuis |
 | Drempel call 2 | `[0,3]`: vóór de freeze gecontroleerd op de ontwikkelset, gedraaid met deze versie op de server (Q8). Gekozen als de hoogste drempel waarbij de recall daar ≥ 95% is. Wordt tijdens de validatie niet aangepast. |
