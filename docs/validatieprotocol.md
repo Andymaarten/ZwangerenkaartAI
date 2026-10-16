@@ -18,9 +18,11 @@ medische gegevens en 88 aandachtspunten. Per aandachtspunt toont het alleen lett
 oordeel of score. De zorgverlener beoordeelt de passages en beslist. Het systeem draait lokaal in het Spaarne Gasthuis
 (MDR klasse I, in-house).
 
-**Claim die deze validatie toetst:** bij aandachtspunten die volgens de expert van toepassing zijn, toont het systeem
-passages in minstens 90% van de gevallen (ondergrens van het 95%-betrouwbaarheidsinterval), gemeten tegen de gouden
-standaard: het oordeel van de experts na inzage van de passages en het zorgplan (E1).
+**Claim die deze validatie toetst** (overeenkomst, fase 2: "de validatie is geslaagd als tijdens de test 90% van de
+noodzakelijke aandachtspunten in de samenvatting worden genoemd"): van de aandachtspunten die volgens de gouden standaard
+van toepassing zijn, noemt het systeem er minstens 90% in het rapport, met minstens één passage. De gouden standaard is
+het oordeel van de beoordelende gynaecoloog na inzage van de passages en het zorgplan (E1); samengestelde
+aandachtspunten worden gescoord volgens §4.8 en AP079 telt niet mee (§4.7).
 
 De validatie toetst niet of het gebruik van het systeem klinische uitkomsten verbetert.
 
@@ -35,11 +37,27 @@ De versie wordt bevroren vóór de run en verandert daarna niet.
 | Docker-image (digest) | `andymaarten/zorgplan:v3-ontwikkelset-20261015` · `sha256:02a566777d1fedff41d98fb8c55e625210a9150b30e54b14d05b72d5b5ba5907` |
 | Config-hash (code, prompts, aandachtspunten, vragenlijst, drempel, model) | `c31db1d8ba93` bij modelnaam `medgemma`; heet het model op de server anders, dan geldt de hash uit het eerste serverrapport `[ ]` |
 | Model | medgemma 27B, kwantisatie Q8_0, via Ollama, op de server van het Spaarne Gasthuis |
-| Drempel call 2 | `[0,3]`: vóór de freeze gecontroleerd op de ontwikkelset, gedraaid met deze versie op de server (Q8). Gekozen als de hoogste drempel waarbij de recall daar ≥ 95% is. Wordt tijdens de validatie niet aangepast. |
+| Drempel call 2 | `[ ]`, vastgesteld volgens §2.1. Wordt tijdens de validatie niet aangepast. |
 | Git-sync van `questions/` tijdens de run | uit (`GIT_SYNC_QUESTIONS=0` in de `.env` van de server; waarde vastleggen) |
 
 Elke resultaatfile bevat code-commit en config-hash. Kaarten met een andere config-hash tellen niet mee voor de primaire
 analyse (het analysescript meldt dit).
+
+### 2.1 Vaststelling van de drempel
+
+De drempel bepaalt welke passages call 2 laat staan (een passage blijft als de kans op *ja* minstens de drempel is).
+Hij wordt één keer vastgesteld, vóór de validatierun, en daarna niet meer veranderd.
+
+- **Gegevens:** de laatste run op de ontwikkelset (kaarten 1–40) met de bevroren versie op de server, vergeleken met de
+  gouden standaard van de ontwikkelset (samengestelde aandachtspunten volgens methode A, §4.8). De kansen per passage
+  worden bij elke run opgeslagen, dus de recall bij elke drempel is uit te rekenen zonder het model opnieuw te draaien
+  (`tools/analyse.py`).
+- **Regel:** de drempel is de hoogste waarde waarbij de recall op de ontwikkelset minstens [97]% is.
+- **Waarom een marge:** de definities en de drempel zijn op de ontwikkelset afgesteld, dus de recall op nieuwe kaarten
+  valt naar verwachting lager uit. De marge boven het criterium van 90% (§5) vangt dat op. De prijs is meer onterechte
+  passages; het aantal fout-positieven per kaart bij de gekozen drempel wordt gerapporteerd.
+- **Vastlegging:** drempel, bijbehorende recall en fout-positieven per kaart op de ontwikkelset, en de config-hash
+  (die de drempel bevat) worden in §2 en in `docs/versies.md` ingevuld vóór de validatierun.
 
 ## 3. Kaarten
 
@@ -120,8 +138,12 @@ recall = aantal (E1 = 1 en M = 1) / aantal (E1 = 1)
   onafhankelijke waarnemingen (zelfde patiënt, zelfde kaart, zelfde beoordelaars). Daarom worden 2000 keer 40 kaarten
   met teruglegging getrokken, telkens wordt de recall berekend, en het 2,5e en 97,5e percentiel vormen het interval
   (vast zaad). Het Wilson-interval, dat de samenhang negeert, wordt daarnaast gerapporteerd.
-- **Succescriterium:** de ondergrens van het bootstrapinterval is ≥ 90%.
-- Ter indicatie: bij ~150 positieven wordt dit gehaald met hoogstens ~7 missers.
+- **Succescriterium:** de recall tegen E1 is minstens 90% (puntschatting), zoals in de overeenkomst. Bij ~150 positieven
+  betekent dat hoogstens 15 missers.
+- Het 95%-betrouwbaarheidsinterval wordt altijd gerapporteerd, met de vermelding of de ondergrens ook boven 90% ligt.
+  Dat laatste is geen slaagcriterium, maar zegt hoe zeker de uitkomst is.
+- **Hernieuwde validatie:** wordt het criterium niet gehaald, dan kan de versie worden aangepast (vastgelegd in
+  `docs/versies.md`) en opnieuw gevalideerd met dit protocol, op een nieuwe set kaarten die niet eerder is gebruikt.
 - **Bias.** E1 komt tot stand na inzage van de uitvoer van het systeem. Aandachtspunten die de experts pas na inzage
   toevoegen, zijn vooral punten die het systeem toonde; punten die systeem, zorgplan en experts alle drie missen, komen
   niet boven. De recall tegen E1 valt daardoor gunstiger uit dan de werkelijke recall (*incorporation bias*). Daarom
