@@ -52,9 +52,9 @@ Hij wordt één keer vastgesteld, vóór de validatierun, en daarna niet meer ve
   gouden standaard van de ontwikkelset (samengestelde aandachtspunten volgens methode A, §4.8). De kansen per passage
   worden bij elke run opgeslagen, dus de recall bij elke drempel is uit te rekenen zonder het model opnieuw te draaien
   (`tools/analyse.py`).
-- **Regel:** de drempel is de hoogste waarde waarbij de recall op de ontwikkelset minstens [97]% is.
+- **Regel:** de drempel is de hoogste waarde waarbij de **puntrecall** (puntschatting, zonder betrouwbaarheidsinterval) op de ontwikkelset minstens **98%** is (vastgelegd 19-10-2026).
 - **Waarom een marge:** de definities en de drempel zijn op de ontwikkelset afgesteld, dus de recall op nieuwe kaarten
-  valt naar verwachting lager uit. De marge boven het criterium van 90% (§5) vangt dat op. De prijs is meer onterechte
+  valt naar verwachting lager uit. De marge van 8 procentpunten boven het criterium van 90% (§5) vangt dat op. De prijs is meer onterechte
   passages; het aantal fout-positieven per kaart bij de gekozen drempel wordt gerapporteerd.
 - **Vastlegging:** drempel, bijbehorende recall en fout-positieven per kaart op de ontwikkelset, en de config-hash
   (die de drempel bevat) worden in §2 en in `docs/versies.md` ingevuld vóór de validatierun.
