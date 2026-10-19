@@ -30,11 +30,19 @@ def gouden_standaard(pad: Path) -> Dict[tuple, int]:
                 if r.get("juist", "").strip() in ("0", "1")}
 
 
-def score(ap: Dict[str, Any]) -> float:
+def score(ap: Dict[str, Any], drempel: float = 0.3) -> float:
+    """Hoogste P(ja) over de kandidaten, maar altijd in lijn met het rapport: een passage van Python
+    (python_factor, zonder kans) telt als 1; zijn de passages na call 2 nog weggehaald (poort: alleen de meetregel),
+    dan blijft de score net onder de drempel."""
     if ap.get("modus") == "python" or "kandidaten" not in ap:      # oudere runs zonder call 2: passage = 1
         return 1.0 if ap.get("passages") else 0.0
+    if any(isinstance(p, dict) and p.get("bron") == "python" for p in ap.get("passages") or []):
+        return 1.0
     kansen = [1.0 if p.get("kans") is None else p["kans"] for p in ap.get("kandidaten") or []]
-    return max(kansen, default=0.0)
+    s = max(kansen, default=0.0)
+    if not ap.get("passages") and s >= drempel:
+        return drempel - 1e-4
+    return s
 
 
 def lees(map_: Path, gs: Dict[tuple, int], met_passages: bool) -> Dict[str, Any]:
@@ -63,7 +71,7 @@ def lees(map_: Path, gs: Dict[tuple, int], met_passages: bool) -> Dict[str, Any]
             if e is None or a["id"] in UITGESLOTEN:
                 continue
             rij = {"id": a["id"], "label": a.get("label", ""), "cat": a.get("categorie", ""), "modus": a.get("modus"),
-                   "s": round(score(a), 4), "y": e, "kand": len(a.get("kandidaten") or a.get("passages") or [])}
+                   "s": round(score(a, float(meta.get("drempel") or 0.3)), 4), "y": e, "kand": len(a.get("kandidaten") or a.get("passages") or [])}
             if met_passages:
                 rij["p"] = [[p.get("tekst", ""), p.get("kans")]
                             for p in (a.get("kandidaten") or a.get("passages") or [])]
