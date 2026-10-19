@@ -97,26 +97,27 @@ Per kaart en per aandachtspunt worden vier beoordelingen vastgelegd (0 = niet va
 | Code | Beoordeling | Door | Moment |
 |---|---|---|---|
 | **ZP** | Zorgplan zoals in de huidige praktijk opgesteld | wetenschappelijk stagiair, los van de experts | vooraf |
-| **E0** | Eerste oordeel van de expert, zonder uitvoer van het systeem en zonder zorgplan | één van twee gynaecologen per kaart (de kaarten zijn verdeeld) | vóór inzage, vastgelegd met commit |
+| **E0** | Eerste oordeel van de experts, zonder uitvoer van het systeem en zonder zorgplan: twee onafhankelijke beoordelingen per kaart en hun consensus | twee gynaecologen, elk alle kaarten | vóór inzage, vastgelegd met commit |
 | **M** | Systeem: passages getoond (1) of niet (0), plus de interne score | de bevroren versie | validatierun |
-| **E1** | Oordeel van de expert na inzage van de passages én het zorgplan: de uiteindelijke gouden standaard | dezelfde gynaecoloog als bij E0 | na de run |
+| **E1** | Oordeel van de experts na inzage van de passages én het zorgplan: de uiteindelijke gouden standaard | dezelfde twee gynaecologen, in consensus | na de run |
 
 **Werkwijze.**
 
-1. De kaarten worden verdeeld over twee gynaecologen; elke kaart wordt door één van hen beoordeeld. De gynaecoloog
-   scoort E0 op basis van de zwangerenkaart, zonder de uitvoer van het systeem of het zorgplan te zien. Het bestand met
-   E0 (kaartnummer, AP, 0/1, beoordelaar A of B, geen patiëntgegevens) wordt gecommit **vóórdat** de experts enige
-   uitvoer van het systeem of het zorgplan zien. De commit-hash bewijst de volgorde.
+1. Twee gynaecologen beoordelen elk alle kaarten, onafhankelijk van elkaar, op basis van de zwangerenkaart, zonder de
+   uitvoer van het systeem of het zorgplan te zien. Hun overeenstemming wordt gerapporteerd (positive agreement en
+   Cohen's kappa). Verschillen lossen ze daarna samen op tot één E0, nog steeds zonder systeem en zorgplan; komen ze er
+   niet uit, dan beslist een derde gynaecoloog uit de vakgroep aan de hand van het codeboek. De bestanden (beide
+   afzonderlijke beoordelingen en de consensus; kaartnummer, AP, 0/1, geen patiëntgegevens) worden gecommit
+   **vóórdat** de experts enige uitvoer van het systeem of het zorgplan zien. De commit-hash bewijst de volgorde.
 2. ZP wordt onafhankelijk van E0 gecodeerd en ook vóór de inzage gecommit.
-3. Daarna ziet de gynaecoloog het rapport van het systeem en het zorgplan, en legt E1 vast. Elke wijziging ten
+3. Daarna zien de gynaecologen het rapport van het systeem en het zorgplan, en leggen ze samen E1 vast. Elke wijziging ten
    opzichte van E0 krijgt een aanleiding (systeem, zorgplan, beide, eigen herlezing) en een reden: (a) gemist bij het
    lezen, (b) andere interpretatie van de definitie, (c) passage of zorgplan overtuigend, (d) anders.
 4. **Blinde bevestiging van toegevoegde aandachtspunten.** Alle gevallen met E0 = 0 en E1 = 1 worden, gemengd met een
-   gelijk aantal willekeurige gevallen met E0 = 1 en E0 = 0, voorgelegd aan de andere gynaecoloog, die de kaart niet
-   eerder beoordeelde en niet weet uit welke groep een geval komt.
+   gelijk aantal willekeurige gevallen met E0 = 1 en E0 = 0, voorgelegd aan een derde gynaecoloog uit de vakgroep, die
+   de kaart niet eerder beoordeelde en niet weet uit welke groep een geval komt.
 5. **Codeboek en twijfelgevallen.** Het codeboek is de `betekenis` per aandachtspunt in `aandachtspunten.json` van de
-   bevroren versie. Een twijfelgeval krijgt een opmerking in het bestand en wordt besproken met de andere gynaecoloog;
-   de beoordelaar van de kaart beslist.
+   bevroren versie. Een twijfelgeval krijgt een opmerking in het bestand en wordt in de consensus besproken.
 6. **Niet in de kaart.** Een aandachtspunt dat de experts of het zorgplan kennen uit een andere bron dan deze
    zwangerenkaart (bijvoorbeeld informatie uit het consult), krijgt de aantekening "niet in de kaart" en telt niet mee
    voor de vergelijkingen. Het aantal wordt gerapporteerd.
@@ -154,19 +155,21 @@ recall = aantal (E1 = 1 en M = 1) / aantal (E1 = 1)
 
 1. **Recall tegen het blinde oordeel (E0):** aantal (E0 = 1 en M = 1) / aantal (E0 = 1), met cluster-bootstrapinterval,
    vergeleken met het criterium van §5. Dit is de controle op de bias van de primaire uitkomst.
-2. **Huidige praktijk tegenover de expert:** recall van het zorgplan (aandeel expert-positieven dat in het zorgplan
+2. **Overeenstemming tussen de twee gynaecologen** bij E0, vóór de consensus: positive agreement en Cohen's kappa,
+   over alle aandachtspunten en per categorie.
+3. **Huidige praktijk tegenover de expert:** recall van het zorgplan (aandeel expert-positieven dat in het zorgplan
    staat), precisie van het zorgplan (aandeel zorgplanpunten dat de expert deelt), positive agreement en kappa; ten
    opzichte van E0 en van E1.
-3. **Aanvullende signalering:** aantal gevallen met E0 = 0, M = 1 en E1 = 1, per kaart en per 100 kaarten, met
+4. **Aanvullende signalering:** aantal gevallen met E0 = 0, M = 1 en E1 = 1, per kaart en per 100 kaarten, met
    cluster-bootstrapinterval. Apart: de deelverzameling waarin ook ZP = 0. Met het bevestigingspercentage uit §4.4.
-4. **Wijzigingen in omgekeerde richting:** gevallen met E0 = 1 en E1 = 0.
-5. **Systeem tegenover zorgplan, gepaard:** recall van M en van ZP ten opzichte van E1 (beide bronnen konden E1
+5. **Wijzigingen in omgekeerde richting:** gevallen met E0 = 1 en E1 = 0.
+6. **Systeem tegenover zorgplan, gepaard:** recall van M en van ZP ten opzichte van E1 (beide bronnen konden E1
    beïnvloeden) en van E0, met het verschil en een 95%-interval (gepaarde analyse, cluster-bootstrap). Beschrijvend.
-6. **Zorgplan en systeem samen:** aandeel E1-positieven dat in ZP of M voorkomt, en het aantal dat beide missen.
-7. **PPV en fout-positieven per kaart**, ten opzichte van E1 en van E0.
-8. **Per kaart:** aandeel kaarten waarop het systeem alle E1-positieven vond, aandeel met minstens één misser, en
+7. **Zorgplan en systeem samen:** aandeel E1-positieven dat in ZP of M voorkomt, en het aantal dat beide missen.
+8. **PPV en fout-positieven per kaart**, ten opzichte van E1 en van E0.
+9. **Per kaart:** aandeel kaarten waarop het systeem alle E1-positieven vond, aandeel met minstens één misser, en
    aandeel waarop het systeem een aandachtspunt toonde dat in het zorgplan ontbrak en in E1 werd bevestigd.
-9. **Overig, beschrijvend:** aandachtspunten per rapport;
+10. **Overig, beschrijvend:** aandachtspunten per rapport;
    ROC-AUC en PR-AUC van de interne score; uitkomsten per categorie; verwerkingsduur per kaart.
 
 ## 7. Letterlijkheid
@@ -272,8 +275,6 @@ gebeurt alleen vanuit een versie die deze controle heeft doorlopen.
 
 - Eén ziekenhuis; het systeem werkt op platte tekst en de meest gangbare kaartformaten zijn getest.
 - De experts die E0 scoren, kennen het project en de aandachtspunten.
-- Elke kaart is door één gynaecoloog beoordeeld; de overeenstemming tussen beoordelaars is niet gemeten. De blinde
-  bevestiging door de andere gynaecoloog (§4.4) is een gedeeltelijke controle.
 - E1, de referentie van de primaire uitkomst, is beïnvloed door het systeem (zie §5); de recall tegen het blinde oordeel
   E0 wordt daarom ernaast gerapporteerd.
 - Het zorgplan legt vast wat de zorgverlener heeft opgeschreven, niet wat die heeft gezien.

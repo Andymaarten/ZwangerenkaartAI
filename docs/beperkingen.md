@@ -12,10 +12,9 @@ De meest gangbare kaartformaten in Nederland zijn getest. Kaarten uit andere reg
 die zijn als zoekwoorden toe te voegen zonder de code te wijzigen.
 
 **De gouden standaard is een oordeel.** Experts kunnen een aandachtspunt verschillend interpreteren, en de gouden
-standaard komt tot stand na inzage van het systeem en het zorgplan. Elke kaart wordt door één van twee gynaecologen beoordeeld;
-de overeenstemming tussen beoordelaars is daardoor niet gemeten. Daarom beoordeelt de gynaecoloog eerst blind, wordt de
-recall tegen dat blinde oordeel apart gerapporteerd, krijgt elke wijziging na inzage een reden, en controleert de andere
-gynaecoloog de toegevoegde aandachtspunten blind. Correcties in de gouden standaard zijn in het bestand gemarkeerd met de oorspronkelijke waarde.
+standaard komt tot stand na inzage van het systeem en het zorgplan. Daarom beoordelen twee gynaecologen elke kaart eerst
+onafhankelijk en blind, wordt hun overeenstemming gerapporteerd, staat de recall tegen dat blinde oordeel apart, krijgt
+elke wijziging na inzage een reden, en controleert een derde gynaecoloog de toegevoegde aandachtspunten blind. Correcties in de gouden standaard zijn in het bestand gemarkeerd met de oorspronkelijke waarde.
 
 **Zeldzame aandachtspunten.** Een hoge recall over alle aandachtspunten samen sluit een fout bij een zelden voorkomend
 aandachtspunt niet uit; per aandachtspunt zijn de aantallen te klein voor een eigen schatting. Daarom wordt elke misser

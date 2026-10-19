@@ -40,7 +40,7 @@ tijdens de ontwikkeling zijn gebruikt; alleen de validatieset zegt iets over nie
 ## Validatie
 
 Het validatieprotocol staat in [docs/validatieprotocol.md](docs/validatieprotocol.md) en is vóór de validatierun
-gecommit (preregistratie). Kort: 40 nieuwe kaarten, twee gynaecologen (elk een deel van de kaarten) die eerst blind scoren, vergelijking met het zorgplan
+gecommit (preregistratie). Kort: 40 nieuwe kaarten, twee gynaecologen die elke kaart eerst onafhankelijk en blind scoren, vergelijking met het zorgplan
 uit de huidige praktijk, primaire uitkomst de recall ten opzichte van het expertoordeel na inzage, met de recall ten opzichte van het blinde
 expertoordeel ernaast. Welke versie bij welke
 resultaten hoort: [docs/versies.md](docs/versies.md).

@@ -175,9 +175,9 @@
         <thead><tr><th>Code</th><th>Beoordeling per aandachtspunt per kaart</th><th>Wanneer</th></tr></thead>
         <tbody>
           <tr><td class="code">ZP</td><td>Zorgplan zoals in de huidige praktijk opgesteld</td><td>vooraf</td></tr>
-          <tr><td class="code">E0</td><td>Eerste oordeel van de experts, zonder uitvoer van het systeem en zonder zorgplan</td><td>vastgelegd vóór inzage</td></tr>
+          <tr><td class="code">E0</td><td>Eerste oordeel van twee gynaecologen, elk onafhankelijk over alle kaarten, zonder uitvoer van het systeem en zonder zorgplan; daarna hun consensus</td><td>vastgelegd vóór inzage</td></tr>
           <tr><td class="code">M</td><td>Systeem: passages getoond of niet</td><td>validatierun</td></tr>
-          <tr><td class="code">E1</td><td>Gouden standaard: oordeel van de experts na inzage van de passages en het zorgplan, met reden per wijziging</td><td>na de run</td></tr>
+          <tr><td class="code">E1</td><td>Gouden standaard: oordeel van beide gynaecologen na inzage van de passages en het zorgplan, in consensus, met reden per wijziging</td><td>na de run</td></tr>
         </tbody>
       </table>
     </div>
@@ -223,7 +223,7 @@
     <h2>Beperkingen</h2>
     <ul>
       <li>Alle kaarten komen uit één ziekenhuis. Het systeem werkt op platte tekst, zodat de opmaak van een kaart mag verschillen; de meest gangbare kaartformaten in Nederland zijn getest.</li>
-      <li>De gouden standaard is een expertoordeel dat na inzage van het systeem tot stand komt. Daarom scoort de gynaecoloog eerst blind, staat de recall tegen dat blinde oordeel ernaast en controleert een tweede gynaecoloog de toegevoegde aandachtspunten.</li>
+      <li>De gouden standaard is een expertoordeel dat na inzage van het systeem tot stand komt. Daarom scoren twee gynaecologen elke kaart eerst onafhankelijk en blind, wordt hun overeenstemming gerapporteerd en staat de recall tegen dat blinde oordeel ernaast.</li>
       <li>Zeldzame aandachtspunten komen weinig voor. Elke misser wordt afzonderlijk geanalyseerd en de kwartaalcontroles na ingebruikname lopen door.</li>
       <li>Definities veranderen mee met richtlijnen. Ze staan in een aparte repository; na een wijziging worden ontwikkel- en validatieset opnieuw gedraaid.</li>
     </ul>
