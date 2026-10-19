@@ -4,10 +4,8 @@ title: Validatieprotocol
 
 # Validatieprotocol ZwangerenkaartAI
 
-**Status: CONCEPT.** Dit protocol wordt vóór de validatierun gecommit. De commit-datum en -hash in deze repository gelden
-als preregistratie. Afwijkingen na die commit staan met datum en reden in §12.
-
-Velden tussen `[ ]` worden ingevuld vóór de commit.
+**Status: VASTGESTELD op 19-10-2026**, vóór de validatierun. De commit-datum en -hash van deze versie (GitHub-release
+`validatieprotocol-2026-10-19`) gelden als preregistratie. Afwijkingen daarna staan met datum en reden in §12.
 
 ---
 
@@ -32,12 +30,12 @@ De versie wordt bevroren vóór de run en verandert daarna niet.
 
 | Onderdeel | Waarde |
 |---|---|
-| Code (git-tag en commit) | `v3-ontwikkelset-20261015` · `bb75928` (laatste ontwikkelrun 15→16 okt; bevestigen na die run) |
+| Code (git-tag en commit) | `v3-ontwikkelset-20261015` · `bb75928` (dezelfde versie als de laatste ontwikkelrun, 15→16 okt) |
 | Vragen en aandachtspunten (`questions/`, commit) | `a99f061` · `aandachtspunten.json` versie 5.5 |
 | Docker-image (digest) | `andymaarten/zorgplan:v3-ontwikkelset-20261015` · `sha256:02a566777d1fedff41d98fb8c55e625210a9150b30e54b14d05b72d5b5ba5907` |
-| Config-hash (code, prompts, aandachtspunten, vragenlijst, drempel, model) | `c31db1d8ba93` bij modelnaam `medgemma`; heet het model op de server anders, dan geldt de hash uit het eerste serverrapport `[ ]` |
+| Config-hash (code, prompts, aandachtspunten, vragenlijst, drempel, model) | `bcd127a3bc32` (modelnaam op de server `medgemma:27b-it-q8_0`, drempel 0,3); gelijk aan die van de laatste ontwikkelrun. Elk validatierapport moet deze hash tonen. |
 | Model | medgemma 27B, kwantisatie Q8_0, via Ollama, op de server van het Spaarne Gasthuis |
-| Drempel call 2 | `[ ]`, vastgesteld volgens §2.1. Wordt tijdens de validatie niet aangepast. |
+| Drempel call 2 | `0,3`, vastgesteld volgens §2.1. Wordt tijdens de validatie niet aangepast. |
 | Git-sync van `questions/` tijdens de run | uit (`GIT_SYNC_QUESTIONS=0` in de `.env` van de server; waarde vastleggen) |
 
 Elke resultaatfile bevat code-commit en config-hash. Kaarten met een andere config-hash tellen niet mee voor de primaire
@@ -52,12 +50,16 @@ Hij wordt één keer vastgesteld, vóór de validatierun, en daarna niet meer ve
   gouden standaard van de ontwikkelset (samengestelde aandachtspunten volgens methode A, §4.8). De kansen per passage
   worden bij elke run opgeslagen, dus de recall bij elke drempel is uit te rekenen zonder het model opnieuw te draaien
   (`tools/analyse.py`).
-- **Regel:** de drempel is de hoogste waarde waarbij de **puntrecall** (puntschatting, zonder betrouwbaarheidsinterval) op de ontwikkelset minstens **98%** is (vastgelegd 19-10-2026).
+- **Regel:** de drempel blijft **0,3**, de waarde waarmee de ontwikkelset is gedraaid. Op de ontwikkelset is de
+  **puntrecall** (puntschatting, zonder betrouwbaarheidsinterval) minstens 98% bij elke drempel tot en met 0,8. Er is
+  bewust niet voor de hoogste drempel met 98% gekozen: een lagere drempel geeft op nieuwe kaarten meer marge voor de
+  recall, het primaire criterium (vastgelegd 19-10-2026).
 - **Waarom een marge:** de definities en de drempel zijn op de ontwikkelset afgesteld, dus de recall op nieuwe kaarten
   valt naar verwachting lager uit. De marge van 8 procentpunten boven het criterium van 90% (§5) vangt dat op. De prijs is meer onterechte
   passages; het aantal fout-positieven per kaart bij de gekozen drempel wordt gerapporteerd.
-- **Vastlegging:** drempel, bijbehorende recall en fout-positieven per kaart op de ontwikkelset, en de config-hash
-  (die de drempel bevat) worden in §2 en in `docs/versies.md` ingevuld vóór de validatierun.
+- **Vastlegging:** drempel en config-hash (die de drempel bevat) staan in §2 en in `docs/versies.md`. Recall en
+  fout-positieven per kaart op de ontwikkelset bij deze drempel worden met het analysescript van commit `27e8d7f`
+  (code-repository) berekend en bij de resultaten gerapporteerd.
 
 ## 3. Kaarten
 

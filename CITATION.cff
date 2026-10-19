@@ -21,5 +21,6 @@ authors:
     affiliation: Spaarne Gasthuis
 repository-code: "https://github.com/Andymaarten/ZwangerenkaartAI"
 url: "https://andymaarten.github.io/ZwangerenkaartAI/"
-date-released: "2026-10-16"
+version: "validatieprotocol-2026-10-19"
+date-released: "2026-10-19"
 keywords: [obstetrics, large language model, clinical documentation, MedGemma, validation]

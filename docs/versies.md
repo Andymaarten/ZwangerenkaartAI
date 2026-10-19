@@ -10,8 +10,8 @@ hieronder terug te vinden.
 | Resultaten | Code (tag · commit) | Definities en vragen (commit, niet openbaar) | Docker-image (digest) | Config-hash | Model | Drempel |
 |---|---|---|---|---|---|---|
 | Ontwikkelset (kaarten 1–40) | `v3-ontwikkelset-20261014` · `eaa82da` | `b54abef` (aandachtspunten v5.2) | `sha256:dde28ca449cb…ffb7` | `b417a8436c68` (modelnaam `medgemma`; op de server: hash uit het eerste rapport) | medgemma 27B Q8_0, Ollama | 0,3 |
-| Ontwikkelset, laatste run vóór de validatie (kaarten 1–40) | `v3-ontwikkelset-20261015` · `bb75928` | `a99f061` (aandachtspunten v5.5) | `sha256:02a566777d1fedff41d98fb8c55e625210a9150b30e54b14d05b72d5b5ba5907` | `c31db1d8ba93` (modelnaam `medgemma`) | medgemma 27B Q8_0, Ollama | 0,3 |
-| Validatieset (kaarten 41–80) | `[ ]` | `[ ]` | `[ ]` | `[ ]` | medgemma 27B Q8_0, Ollama | `[ ]` |
+| Ontwikkelset, laatste run vóór de validatie (kaarten 1–40) | `v3-ontwikkelset-20261015` · `bb75928` | `a99f061` (aandachtspunten v5.5) | `sha256:02a566777d1fedff41d98fb8c55e625210a9150b30e54b14d05b72d5b5ba5907` | `bcd127a3bc32` (server, modelnaam `medgemma:27b-it-q8_0`; lokaal met modelnaam `medgemma`: `c31db1d8ba93`) | medgemma 27B Q8_0, Ollama | 0,3 |
+| Validatieset (kaarten 41–80) | `v3-ontwikkelset-20261015` · `bb75928` | `a99f061` (aandachtspunten v5.5) | `sha256:02a566777d1fedff41d98fb8c55e625210a9150b30e54b14d05b72d5b5ba5907` | `bcd127a3bc32` (verwacht; te controleren in elk rapport) | medgemma 27B Q8_0, Ollama | 0,3 |
 
 ## Ontwikkelversies
 
