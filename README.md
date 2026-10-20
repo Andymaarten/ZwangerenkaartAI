@@ -4,14 +4,16 @@
 > the clinician. For each of 88 predefined points of attention it shows only verbatim passages from the record, without
 > a verdict or score; the clinician makes every judgement. It runs fully on-premises with an open model (MedGemma 27B),
 > and no patient data leaves the hospital. This repository contains the method, validation protocol, reference
-> standard, analysis script and aggregated results; the source code is available to reviewers on request. A validation on new records is in progress. Project page:
+> standard, analysis script and aggregated results; the source code is available to reviewers on request. A pre-registered validation on 40 new records showed a recall of 96.9% (95% CI
+> 93.8–99.3%), meeting the pre-specified criterion of ≥ 90%. Project page:
 > <https://andymaarten.github.io/ZwangerenkaartAI/>
 
 ZwangerenkaartAI zet een verloskundige zwangerenkaart (PDF) lokaal om in een overzicht voor de zorgverlener:
 patiëntgegevens, medische gegevens en 88 aandachtspunten. Per aandachtspunt toont het alleen de letterlijke passages uit
 de kaart, zonder oordeel of score. De zorgverlener beoordeelt en beslist.
 
-**Status:** onderzoeksproject van het Spaarne Gasthuis. De validatie op nieuwe kaarten loopt. Niet bedoeld voor
+**Status:** onderzoeksproject van het Spaarne Gasthuis. De validatie op 40 nieuwe kaarten is afgerond (recall 96,9%,
+criterium ≥ 90% gehaald); zie het [validatieverslag](https://andymaarten.github.io/ZwangerenkaartAI/resultaten/validatieverslag.html). Niet bedoeld voor
 klinisch gebruik buiten de validatieomgeving.
 
 **Projectpagina:** <https://andymaarten.github.io/ZwangerenkaartAI/>
