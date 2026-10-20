@@ -90,7 +90,7 @@ reden van exclusie en het aantal kaarten zonder notitie worden gerapporteerd.
 
 **Aantal en selectie.** Minimaal 40 kaarten, aselect geloot uit de kaarten die aan de criteria voldoen. Methode en zaad
 van de loting worden vastgelegd. Het verzamelen gebeurt volgens bijlage A (onderaan).
-De validatiekaarten krijgen de nummers 41–80, in de volgorde van de loting, los van de ontwikkelset.
+De validatiekaarten krijgen de nummers 42–81, in de volgorde van de loting, los van de ontwikkelset.
 
 ## 4. Beoordelingen per aandachtspunt per kaart
 
@@ -285,9 +285,9 @@ gebeurt alleen vanuit een versie die deze controle heeft doorlopen.
 
 ## Bijlage A. Verzamelen van kaart en zorgplannotitie
 
-Per gelote deelnemer, met het validatienummer (041–080):
+Per gelote deelnemer, met het validatienummer (042–081):
 
-1. Sla de zwangerenkaart uit Epic op als PDF met de naam `Kaart_<nummer>` (bijv. `Kaart_041`).
+1. Sla de zwangerenkaart uit Epic op als PDF met de naam `Kaart_<nummer>` (bijv. `Kaart_042`).
 2. Noteer de datum waarop de kaart (digitale verwijzing of scan) in Epic is ontvangen.
 3. Zoek de eerste zorgplannotitie na die datum. Noteer de datum en sla de notitie op als `ZPN_<nummer>`.
 4. Geen zorgplannotitie gevonden: noteer dat; de kaart doet mee zonder ZP.
