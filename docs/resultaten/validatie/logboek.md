@@ -31,7 +31,7 @@ kaarttekst en blijven op de server van het Spaarne Gasthuis; zie onderaan.
 | 20-10-2026 | Voorleglijst gemaakt; consensussessie van beide gynaecologen | lokaal (bevat passages) |
 | 20-10-2026 17:31 | E1 (gouden standaard, met aanleiding en reden) vastgelegd | commit `16b1b00` |
 | 20-10-2026 | Berekening van de uitkomsten (`analyse.py`, `secundair.py`) | `analyse_E1.html`, `analyse_E0.html`, `secundair.md` |
-| [nog invullen] | Validatieverslag gepubliceerd | [commit] |
+| 20-10-2026 21:03 | Validatieverslag versie 1.0 gepubliceerd (HTML en PDF) | commit `aa24175`; GitHub-release `validatieverslag-v1.0` |
 
 ## Nog uit te voeren
 
