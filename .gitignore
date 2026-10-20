@@ -10,3 +10,6 @@ docs/_site/
 passages.csv
 *met_passages*
 analyse_server*.html
+
+# Uitzondering: het openbare validatieverslag
+!docs/resultaten/validatieverslag.pdf

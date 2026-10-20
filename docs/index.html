@@ -31,6 +31,7 @@
       <a class="btn" href="methode.html">Methode</a>
       <a class="btn" href="validatieprotocol.html">Validatieprotocol</a>
       <a class="btn" href="#resultaten">Resultaten</a>
+      <a class="btn" href="resultaten/validatieverslag.html">Validatieverslag</a>
     </nav>
 
   </div>
@@ -161,33 +162,28 @@
   <section id="resultaten">
     <h2>Resultaten</h2>
 
-    <h3><span class="label dev">Ontwikkelset</span></h3>
-    <p>Kaarten die tijdens de ontwikkeling zijn gebruikt. Dit zijn daarom geen validatieresultaten. Eenheid: aandachtspunt per kaart, vergeleken met de gouden standaard. Correcties in de gouden standaard zijn in het bestand gemarkeerd met de oorspronkelijke waarde.</p>
+    <h3><span class="label val">Validatieset</span>&nbsp; 40 nieuwe kaarten</h3>
+    <p>Prospectief vastgelegde validatie op 40 aselect gekozen zwangerenkaarten (kaarten 042–081) met een vooraf bevroren versie. Twee gynaecologen beoordeelden elke kaart onafhankelijk en blind op 88 aandachtspunten, en stelden na inzage van de systeemuitvoer en het zorgplan de gouden standaard vast. Het protocol en elke beoordeling zijn met tijdstempel vastgelegd vóór de volgende stap.</p>
 
-    <div id="dev-resultaten">
-      <div class="placeholder">De cijfers van de ontwikkelset volgen.</div>
+    <div class="stats">
+      <div class="stat"><div class="k">Recall (primair)</div><div class="v">96,9%</div><div class="ci">156/161 · 95%-BI 93,8–99,3</div></div>
+      <div class="stat"><div class="k">Recall tegen blind oordeel</div><div class="v">94,2%</div><div class="ci">129/137 · 95%-BI 90,2–97,7</div></div>
+      <div class="stat"><div class="k">Zorgplan huidige praktijk</div><div class="v">56,5%</div><div class="ci">verschil +40,4 procentpunt (33,1–48,4)</div></div>
+      <div class="stat"><div class="k">Letterlijk uit de kaart</div><div class="v">100%</div><div class="ci">594 van 594 passages</div></div>
     </div>
+    <ul class="small">
+      <li>Succescriterium (recall ≥ 90%, vooraf vastgelegd): <strong>gehaald</strong>, ook tegen het blinde oordeel van de experts.</li>
+      <li>Zorgplan en systeem samen bevatten 97,5% van de aandachtspunten. Het systeem toonde bij 35 van de 40 kaarten minstens één bevestigd aandachtspunt dat in het zorgplan ontbrak.</li>
+      <li>Gemiddeld 7,0 aandachtspunten per rapport, waarvan 3,1 onterecht (PPV 55,9%). Overeenstemming tussen de gynaecologen: kappa 0,81.</li>
+      <li>Rangschikking door het relevantiefilter: ROC-AUC 0,990 (0,979–0,996), PR-AUC 0,903 (0,872–0,933).</li>
+    </ul>
+    <p class="cta"><a class="btn btn-groot" href="resultaten/validatieverslag.html">Lees het volledige validatieverslag</a></p>
+    <p class="small">Methoden, foutenanalyse en beperkingen staan in het verslag. Verloop met tijdstempels: <a href="resultaten/validatie/logboek.html">Logboek</a>. Beoordelingen: <a href="https://github.com/Andymaarten/ZwangerenkaartAI/tree/main/docs/resultaten/validatie">E0, E1 en ZP</a>.</p>
 
-    <h3><span class="label val">Validatieset</span>&nbsp; gepland</h3>
-    <p>Minimaal 40 nieuwe kaarten, niet gebruikt tijdens de ontwikkeling, op een vooraf bevroren versie. Het protocol is vóór de run gepubliceerd. De resultaten komen hier, ook als ze tegenvallen.</p>
-    <div class="tablewrap">
-      <table>
-        <thead><tr><th>Code</th><th>Beoordeling per aandachtspunt per kaart</th><th>Wanneer</th></tr></thead>
-        <tbody>
-          <tr><td class="code">ZP</td><td>Zorgplan zoals in de huidige praktijk opgesteld</td><td>vooraf</td></tr>
-          <tr><td class="code">E0</td><td>Eerste oordeel van twee gynaecologen, elk onafhankelijk over alle kaarten, zonder uitvoer van het systeem en zonder zorgplan; daarna hun consensus</td><td>vastgelegd vóór inzage</td></tr>
-          <tr><td class="code">M</td><td>Systeem: passages getoond of niet</td><td>validatierun</td></tr>
-          <tr><td class="code">E1</td><td>Gouden standaard: oordeel van beide gynaecologen na inzage van de passages en het zorgplan, in consensus, met reden per wijziging</td><td>na de run</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <ol class="steps">
-      <li><strong>Primaire uitkomst:</strong> recall van het systeem ten opzichte van de gouden standaard (E1). De validatie is geslaagd bij een recall van minstens 90%; het 95%-betrouwbaarheidsinterval wordt altijd gerapporteerd. Omdat E1 na inzage van het systeem tot stand komt, wordt de recall ten opzichte van het blinde oordeel (E0) ernaast gerapporteerd.</li>
-      <li><strong>Systeem en huidige praktijk:</strong> recall van systeem en zorgplan, beide ten opzichte van E1.</li>
-      <li><strong>Aanvullende signalering:</strong> aandachtspunten die in E0 (en in ZP) ontbraken, waarvoor het systeem passages toonde en die de expert na inzage bevestigde, per 100 kaarten. Wijzigingen in omgekeerde richting worden ook gerapporteerd.</li>
-      <li><strong>Secundair:</strong> PPV, fout-positieven per kaart, aandachtspunten per rapport, ROC- en PR-AUC, en de prestaties ten opzichte van E0.</li>
-    </ol>
-    <p class="small">Volledig protocol: <a href="validatieprotocol.html">Validatieprotocol</a>. Welke versie bij welke resultaten hoort: <a href="versies.html">Versies</a>.</p>
+    <h3 class="na-cta"><span class="label dev">Ontwikkelset</span>&nbsp; 39 kaarten</h3>
+    <p>Kaarten waarop de definities en instellingen zijn afgesteld, gedraaid met dezelfde bevroren versie. Recall 99,4% (155/156; Wilson 96,5–99,9), 3,05 onterecht getoonde aandachtspunten per kaart. Omdat hierop is afgesteld, is dit een bovengrens van de verwachte prestatie.</p>
+
+    <p class="small">Protocol: <a href="validatieprotocol.html">Validatieprotocol</a>. Welke versie bij welke resultaten hoort: <a href="versies.html">Versies</a>.</p>
   </section>
 
   <section id="nareken">
@@ -284,55 +280,6 @@
   });
 })();
 
-// Resultaten ontwikkelset: resultaten/ontwikkelset.json is de data uit tools/analyse.py (zonder kaarttekst).
-(function () {
-  var doel = document.getElementById('dev-resultaten');
-  fetch('resultaten/ontwikkelset.json').then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (D) {
-    var rijen = [];
-    D.kaarten.forEach(function (k) { k.aps.forEach(function (a) { rijen.push({k: k.k, s: a.s, y: a.y}); }); });
-    var nk = D.kaarten.length, P = rijen.filter(function (r) { return r.y; }).length, N = rijen.length - P;
-    var t = parseFloat((D.drempel_meta || [])[0] || '0.3');
-    function tel(rs) { var c = {tp: 0, fp: 0, fn: 0}; rs.forEach(function (r) { var g = r.s >= t;
-      if (r.y && g) c.tp++; else if (r.y) c.fn++; else if (g) c.fp++; }); return c; }
-    function wilson(x, n) { var z = 1.96, p = x / n, d = 1 + z * z / n, m = (p + z * z / (2 * n)) / d,
-      h = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d; return [m - h, Math.min(1, m + h)]; }
-    var c = tel(rijen), rec = c.tp / P, ppv = c.tp / (c.tp + c.fp), wr = wilson(c.tp, P), wp = wilson(c.tp, c.tp + c.fp);
-    var drempels = Array.from(new Set([0].concat(rijen.map(function (r) { return r.s; }), [1.0001]))).sort(function (a, b) { return b - a; });
-    var curve = drempels.map(function (d) { var tp = 0, fp = 0; rijen.forEach(function (r) { if (r.s >= d) { if (r.y) tp++; else fp++; } });
-      return {tpr: tp / P, fpr: fp / N, ppv: tp + fp ? tp / (tp + fp) : 1}; });
-    var auc = 0, prauc = 0;
-    for (var i = 1; i < curve.length; i++) { auc += (curve[i].fpr - curve[i - 1].fpr) * (curve[i].tpr + curve[i - 1].tpr) / 2;
-      prauc += (curve[i].tpr - curve[i - 1].tpr) * curve[i].ppv; }
-    var pct = function (x) { return (100 * x).toFixed(1).replace('.', ',') + '%'; };
-    var nl = function (x, d) { return x.toFixed(d).replace('.', ','); };
-    var hier = {tpr: rec, fpr: c.fp / N, ppv: ppv};
-    function grafiek(lijnen, punt, asx, asy) {
-      var X = function (x) { return 46 + 240 * x; }, Y = function (y) { return 252 - 240 * y; };
-      var s = '<svg viewBox="0 0 300 300" role="img"><rect x="46" y="12" width="240" height="240" fill="none" stroke="var(--border)"/>';
-      [0, .5, 1].forEach(function (v) { s += '<text x="' + X(v) + '" y="268" text-anchor="middle">' + nl(v, v % 1 ? 1 : 0) + '</text><text x="40" y="' + (Y(v) + 4) + '" text-anchor="end">' + nl(v, v % 1 ? 1 : 0) + '</text>'; });
-      s += '<text x="166" y="290" text-anchor="middle">' + asx + '</text>';
-      s += '<text transform="translate(12,132) rotate(-90)" text-anchor="middle" x="0" y="0">' + asy + '</text>';
-      lijnen.forEach(function (l) { s += '<polyline fill="none" stroke="' + l[1] + '" stroke-width="2" stroke-dasharray="' + (l[2] || '') + '" points="' +
-        l[0].map(function (p) { return X(p[0]) + ',' + Y(p[1]); }).join(' ') + '"/>'; });
-      if (punt) s += '<circle cx="' + X(punt[0]) + '" cy="' + Y(punt[1]) + '" r="5" fill="var(--warn)"/>';
-      return s + '</svg>';
-    }
-    doel.innerHTML =
-      '<div class="stats">' +
-      '<div class="stat"><div class="k">Recall</div><div class="v">' + pct(rec) + '</div><div class="ci">' + c.tp + '/' + P + ' · 95%-BI ' + Math.round(100 * wr[0]) + '–' + Math.round(100 * wr[1]) + '</div></div>' +
-      '<div class="stat"><div class="k">PPV</div><div class="v">' + pct(ppv) + '</div><div class="ci">' + c.tp + '/' + (c.tp + c.fp) + ' · 95%-BI ' + Math.round(100 * wp[0]) + '–' + Math.round(100 * wp[1]) + '</div></div>' +
-      '<div class="stat"><div class="k">Fout-positief per kaart</div><div class="v">' + nl(c.fp / nk, 1) + '</div><div class="ci">' + c.fp + ' over ' + nk + ' kaarten</div></div>' +
-      '<div class="stat"><div class="k">ROC-AUC</div><div class="v">' + nl(auc, 3) + '</div><div class="ci">PR-AUC ' + nl(prauc, 3) + '</div></div>' +
-      '</div>' +
-      '<p class="small">' + nk + ' kaarten, ' + rijen.length + ' beoordeelde aandachtspunten, waarvan ' + P + ' positief volgens de gouden standaard. 95%-betrouwbaarheidsintervallen volgens Wilson.</p>' +
-      '<div class="charts">' +
-      '<figure class="chart"><h4>ROC-curve <span>· AUC ' + nl(auc, 3) + '</span></h4>' +
-        grafiek([[curve.map(function (q) { return [q.fpr, q.tpr]; }), 'var(--accent)'], [[[0, 0], [1, 1]], 'var(--border)', '4']], [hier.fpr, hier.tpr], 'fout-positief-fractie', 'recall') + '</figure>' +
-      '<figure class="chart"><h4>Precision-recall-curve <span>· AUC ' + nl(prauc, 3) + '</span></h4>' +
-        grafiek([[curve.map(function (q) { return [q.tpr, q.ppv]; }), 'var(--accent)']], [hier.tpr, hier.ppv], 'recall', 'PPV') + '</figure>' +
-      '</div><p class="small">De oranje stip is het werkpunt van het systeem zoals het draait.</p>';
-  }).catch(function () {});
-})();
 </script>
 </body>
 </html>

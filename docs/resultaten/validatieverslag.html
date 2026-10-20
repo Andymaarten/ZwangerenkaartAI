@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Validatieverslag · ZwangerenkaartAI</title>
+<link rel="stylesheet" href="../assets/style.css"><style>
+.fig-verslag { margin: 1.6rem 0; padding: 0; }
+.fig-verslag svg { width: 100%; height: auto; display: block; max-width: 640px; margin: 0 auto; }
+.fig-verslag text { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; fill: var(--text); }
+.fig-verslag .tk { font-size: 10.5px; } .fig-verslag .tk-inv { font-size: 10.5px; fill: var(--bg); }
+.fig-verslag .lb { font-size: 11.5px; } .fig-verslag .at { font-size: 11px; } .fig-verslag .pl { font-size: 14px; font-weight: 700; }
+.fig-verslag .ax { stroke: var(--text); stroke-width: 1; } .fig-verslag .ci { stroke: var(--text); stroke-width: 1.2; }
+.fig-verslag .crit { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; fill: none; }
+.fig-verslag .curve { fill: none; stroke: var(--text); stroke-width: 1.6; }
+.fig-verslag .pt-vol { fill: var(--text); stroke: var(--text); stroke-width: 1.2; }
+.fig-verslag .pt-open { fill: var(--bg); stroke: var(--text); stroke-width: 1.4; }
+.fig-verslag .f1 { fill: var(--text); } .fig-verslag .f2 { fill: var(--muted); }
+.fig-verslag .f3 { fill: var(--border); } .fig-verslag .f4 { fill: var(--bg); stroke: var(--text); stroke-width: 1; }
+.fig-verslag figcaption { font-size: .86rem; line-height: 1.45; color: var(--text); margin: .7rem auto 0; max-width: 640px; }
+.fig-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 640px; margin: 0 auto; }
+.tw { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.doc .tw table { display: table; width: 100%; margin: 0; border: 0; border-radius: 0; border-collapse: collapse; background: none; }
+.doc .tw th, .doc .tw td { padding: .45rem .65rem; }
+.pdf-knop { display: inline-block; margin: .2rem 0 1rem; padding: .4rem .9rem; border-radius: 999px; background: var(--text); color: var(--bg); text-decoration: none; font-size: .9rem; }
+@media (max-width: 640px) { .fig-twee { grid-template-columns: 1fr; } }
+@media print {
+  .doc-nav, .pdf-knop, footer { display: none; }
+  :root, body { --bg: #fff; --surface: #fff; background: #fff !important; }
+  body { font-size: 10.5pt; } .doc { max-width: none; padding: 0; }
+  h2, h3, h4 { break-after: avoid; page-break-after: avoid; } figure, .tw { break-inside: avoid; } tr { break-inside: avoid; }
+  .kop-blok { break-inside: avoid; page-break-inside: avoid; }
+  h1 { margin-top: 0; }
+  .tw { overflow: visible; } .doc .tw table { font-size: 8.5pt; } .doc .tw th, .doc .tw td { padding: .3rem .45rem; }
+  a { color: inherit; text-decoration: none; }
+}
+@page { size: A4; margin: 18mm 16mm; }
+</style>
+<script>try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
+</head><body><div class="doc"><nav class="doc-nav"><a class="home" href="../index.html">ZwangerenkaartAI</a><a href="../methode.html">Methode</a><a href="../validatieprotocol.html">Validatieprotocol</a><a href="validatieverslag.html">Validatieverslag</a><a href="../beperkingen.html">Beperkingen</a><a href="../versies.html">Versies</a><a href="https://github.com/Andymaarten/ZwangerenkaartAI">GitHub</a></nav><main>
+<h1 id="validatie-van-zwangerenkaartai-letterlijke-passages-per-aandachtspunt-uit-de-verloskundige-zwangerenkaart">Validatie van ZwangerenkaartAI: letterlijke passages per aandachtspunt uit de verloskundige zwangerenkaart</h1>
+<p><a class="pdf-knop" href="validatieverslag.pdf">Download als PDF</a></p>
+<p><strong>Validatieverslag, versie 1.0</strong> · 20 oktober 2026 · Spaarne Gasthuis</p>
+<blockquote>
+<p><strong>Summary.</strong> We validated ZwangerenkaartAI, a local system that shows verbatim passages from Dutch obstetric referral
+records for 88 predefined points of attention ("aandachtspunten"), on 40 new records ("zwangerenkaarten") with a frozen
+code version and a protocol registered before the run. Two gynaecologists independently scored every record blind to
+the system and the care plan (routine practice), and then established a reference standard after review of system
+output and care plan. Recall against the reference standard was 96.9% (95% CI 93.8–99.3%), meeting the pre-specified
+criterion of ≥ 90%; against the blind assessment it was 94.2% (90.2–97.7%). The care plan written in routine practice
+contained 56.5% of the points of attention; the difference of 40.4 percentage points (33.1–48.4) favoured the system.
+All 594 displayed passages were verbatim from the record.</p>
+</blockquote>
+<div class="kop-blok"><h2 id="samenvatting">Samenvatting</h2>
+<p><strong>Doel.</strong> Vaststellen of ZwangerenkaartAI de aandachtspunten die in een zwangerenkaart van toepassing zijn, met
+letterlijke passages in het rapport toont, en hoe dat zich verhoudt tot het zorgplan in de huidige praktijk.</p></div>
+<p><strong>Methode.</strong> Prospectief vastgelegde validatie op 40 nieuwe, aselect gekozen zwangerenkaarten (verwijzingen uit de
+eerste lijn, tweede en derde kwartaal van 2026, met toestemming), met een vooraf bevroren versie van het systeem. Twee
+gynaecologen beoordeelden elke kaart onafhankelijk en blind op 88 aandachtspunten (E0) en stelden na inzage van de
+systeemuitvoer en het zorgplan de gouden standaard vast (E1). Een wetenschappelijk student codeerde onafhankelijk het
+zorgplan (ZP). Primaire uitkomst: recall van het systeem tegen E1; succescriterium ≥ 90%.</p>
+<p><strong>Resultaten.</strong> Recall tegen E1 96,9% (95%-BI 93,8–99,3%; 156 van 161), tegen E0 94,2% (90,2–97,7%). Het zorgplan bevatte
+56,5% (48,4–63,9%) van de aandachtspunten in E1; verschil systeem − zorgplan 40,4 procentpunt (33,1–48,4). Zorgplan en
+systeem samen bevatten 97,5% van de aandachtspunten. De gynaecologen voegden na inzage 27 aandachtspunten toe die ze eerst
+hadden gemist; bij 19 daarvan ontbrak het aandachtspunt ook in het zorgplan. Gemiddeld toonde het systeem 3,1 onterechte
+aandachtspunten per kaart (PPV 55,9%). Alle getoonde passages stonden letterlijk in de kaart.</p>
+<p><strong>Conclusie.</strong> ZwangerenkaartAI haalt het vooraf vastgelegde criterium ruim, ook tegen het blinde oordeel van de
+experts, en signaleert aanzienlijk meer aandachtspunten die volgens de experts van toepassing zijn dan in het zorgplan
+uit de huidige praktijk worden vastgelegd.</p>
+<div class="kop-blok"><h2 id="1-inleiding">1. Inleiding</h2>
+<p>Bij verwijzing vanuit de eerste lijn beoordeelt een gynaecoloog, arts-assistent, physician assistant of klinisch
+verloskundige de zwangerenkaart en legt de relevante aandachtspunten vast in een zorgplan. Zwangerenkaarten zijn lang en
+ongestructureerd, waardoor aandachtspunten gemist kunnen worden. ZwangerenkaartAI toont per aandachtspunt de letterlijke
+passages uit de kaart, zonder oordeel of score; de zorgverlener beoordeelt ze. Het systeem draait volledig binnen het
+ziekenhuis met een open taalmodel. De werking staat beschreven in <a href="../methode.html">Methode</a>.</p></div>
+<p>Deze validatie toetst één claim: dat het systeem aandachtspunten die van toepassing zijn, in het rapport noemt. Klinische
+uitkomsten en tijdsbesparing vallen buiten deze validatie.</p>
+<div class="kop-blok"><h2 id="2-methoden">2. Methoden</h2>
+<h3 id="21-opzet-en-preregistratie">2.1 Opzet en preregistratie</h3>
+<p>Diagnostische validatiestudie met een gepaarde vergelijking tegen het zorgplan. Het <a href="../validatieprotocol.html">validatieprotocol</a>
+is vóór de validatierun vastgesteld en openbaar gepubliceerd (GitHub-release <code>validatieprotocol-2026-10-19</code>). Alle
+beoordelingen zijn met tijdstempel vastgelegd in de openbare repository voordat de volgende stap begon (§2.8, en het
+<a href="validatie/logboek.html">logboek</a>).</p></div>
+<div class="kop-blok"><h3 id="22-systeem-en-versie">2.2 Systeem en versie</h3>
+<p>Bevroren versie <code>v3-ontwikkelset-20261015</code> (commit <code>bb75928</code>), aandachtspunten v5.5, Docker-image
+<code>sha256:02a5667…5907</code>, model MedGemma 27B (Q8_0) via Ollama op een server van het Spaarne Gasthuis, met de vooraf
+vastgelegde instellingen (protocol §2.1). Alle 40 kaarten zijn verwerkt met dezelfde configuratie (config-hash
+<code>bcd127a3bc32</code>). Zie <a href="../versies.html">Versies</a>.</p></div>
+<div class="kop-blok"><h3 id="23-ontwikkelset">2.3 Ontwikkelset</h3>
+<p>De definities en instellingen zijn vastgesteld op een ontwikkelset van 39 beoordeelde kaarten (kaarten 1–40; kaart 3 niet
+beoordeeld). Met de bevroren versie was de recall daar 99,4% (155 van 156; Wilson 96,5–99,9%), bij 3,05 onterecht getoonde
+aandachtspunten per kaart. Omdat op deze kaarten is afgesteld, is dit een bovengrens van de verwachte prestatie.</p></div>
+<div class="kop-blok"><h3 id="24-kaarten">2.4 Kaarten</h3>
+<p>Aselecte steekproef van 40 zwangerenkaarten van zwangeren die vanuit de eerste lijn naar het Spaarne Gasthuis waren
+verwezen, in het tweede of derde kwartaal van 2026, en die schriftelijk toestemming gaven. Per patiënt is de kaart gebruikt
+zoals die bij verwijzing in Epic binnenkwam. Geen overlap met de ontwikkelset. De kaarten zijn genummerd 042–081. Alle
+40 kaarten hadden een zorgplannotitie.</p></div>
+<div class="kop-blok"><h3 id="25-beoordelingen">2.5 Beoordelingen</h3>
+<p>Per kaart en per aandachtspunt (40 × 88 = 3.520 beoordelingen, elk 1 of 0):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Beoordeling</th>
+<th>Door</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E0_A, E0_B</td>
+<td>Onafhankelijke, blinde beoordeling (zonder systeemuitvoer en zonder zorgplan)</td>
+<td>twee gynaecologen, elk alle kaarten</td>
+</tr>
+<tr>
+<td>E0</td>
+<td>Consensus van E0_A en E0_B, nog steeds blind</td>
+<td>beide gynaecologen</td>
+</tr>
+<tr>
+<td>ZP</td>
+<td>Gecodeerd zorgplan: de eerste zorgplannotitie na verwijzing</td>
+<td>wetenschappelijk student, los van de gynaecologen</td>
+</tr>
+<tr>
+<td>M</td>
+<td>Systeem: aandachtspunt met minstens één passage in het rapport</td>
+<td>bevroren versie</td>
+</tr>
+<tr>
+<td>E1</td>
+<td>Gouden standaard: oordeel na inzage van systeemuitvoer en zorgplan, met aanleiding en reden per wijziging</td>
+<td>beide gynaecologen, in consensus</td>
+</tr>
+</tbody>
+</table></div></div>
+<p>Samengestelde aandachtspunten (risicofactoren voor pre-eclampsie, diabetes gravidarum en trombose) zijn 1 als minstens
+één factor uit de factorlijst in de kaart staat. AP079 (kwetsbaarheden) telt niet mee. Daarmee resteren 3.480
+beoordelingen.</p>
+<div class="kop-blok"><h3 id="26-uitkomstmaten">2.6 Uitkomstmaten</h3>
+<ul>
+<li><strong>Primair:</strong> recall van M tegen E1. Succescriterium: ≥ 90%.</li>
+<li><strong>Secundair:</strong> recall tegen E0; PPV en onterecht getoonde aandachtspunten per kaart; overeenstemming tussen de
+  gynaecologen; recall en precisie van het zorgplan; gepaard verschil tussen systeem en zorgplan; aanvullende signalering
+  (E0 = 0, M = 1, E1 = 1); letterlijkheid van de getoonde passages; beschrijvend de ROC-AUC en PR-AUC van de
+  rangschikking door het relevantiefilter.</li>
+</ul></div>
+<div class="kop-blok"><h3 id="27-analyse">2.7 Analyse</h3>
+<p>95%-betrouwbaarheidsintervallen met een cluster-bootstrap per kaart (2.000 trekkingen, vast zaad), omdat aandachtspunten
+binnen een kaart samenhangen. Overeenstemming als positive agreement en Cohen's kappa. Analyse met de openbare scripts
+<code>tools/analyse.py</code> en <code>tools/secundair.py</code>.</p></div>
+<div class="kop-blok"><h3 id="28-verloop">2.8 Verloop</h3>
+<ol>
+<li>Validatierun op de server op 19-10-2026, na publicatie van het protocol, met de bevroren versie; de uitkomsten zijn
+   niet ingezien tot E1 was vastgelegd.</li>
+<li>E0_A, E0_B en ZP vastgelegd op 20-10-2026 om 11:13 UTC (commit <code>78f336f</code>).</li>
+<li>E0 (consensus) vastgelegd op 20-10-2026 om 12:27 UTC (commit <code>2e8c165</code>).</li>
+<li>Inzage van systeemuitvoer en zorgplan; E1 vastgelegd op 20-10-2026 om 17:31 UTC (commit <code>16b1b00</code>).</li>
+<li>Berekening van de uitkomsten op 20-10-2026.</li>
+</ol></div>
+<p>De vastlegging van E0_A, E0_B, ZP en E0 is direct daarna per e-mail aan het projectteam gemeld. Het volledige verloop
+met tijdstempels staat in het <a href="validatie/logboek.html">logboek</a>.</p>
+<div class="kop-blok"><h3 id="29-rollen">2.9 Rollen</h3>
+<p>Twee gynaecologen (beoordelingen en consensus); een wetenschappelijk student (codering van het zorgplan, voorbereiding van
+de consensussessies); de technisch lead (begeleiding van het proces, analysescripts, uitvoering en codering); een
+IT-medewerker buiten het projectteam (uitvoering van de scripts op de server, in de beschermde omgeving van het
+ziekenhuis).</p></div>
+<div class="kop-blok"><h2 id="3-resultaten">3. Resultaten</h2>
+<h3 id="31-kenmerken">3.1 Kenmerken</h3>
+<p>40 kaarten, 3.480 beoordelingen. Positief volgens E0: 137; volgens E1: 161. Gemiddeld 7,0 aandachtspunten per rapport
+(bereik 1–15). Verwerkingstijd gemiddeld 16,5 minuten per kaart (8–28). Geen technische fouten.</p></div>
+<div class="kop-blok"><h3 id="32-primaire-uitkomst">3.2 Primaire uitkomst</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>Recall</th>
+<th>95%-BI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Systeem tegen E1 (primair)</strong></td>
+<td><strong>96,9%</strong> (156/161)</td>
+<td>93,8–99,3%</td>
+</tr>
+<tr>
+<td>Systeem tegen E0</td>
+<td>94,2% (129/137)</td>
+<td>90,2–97,7%</td>
+</tr>
+</tbody>
+</table></div></div>
+<p>Het succescriterium (≥ 90%) is gehaald. Ook de ondergrens van het interval ligt boven 90%, zowel tegen E1 als tegen het
+blinde oordeel.</p>
+<figure class="fig-verslag"><svg viewBox="0 0 640 176" role="img" aria-label="Recall van systeem en zorgplan"><circle cx="210.0" cy="14.0" r="4.2" class="pt-vol"/><text x="220" y="18" class="tk">Systeem</text><circle cx="290.0" cy="14.0" r="4.2" class="pt-open"/><text x="300" y="18" class="tk">Zorgplan</text><line x1="561.0" y1="28" x2="561.0" y2="132" class="crit"/><text x="565.0" y="36" class="tk">90%</text><text x="198" y="59" text-anchor="end" class="lb">Tegen gouden standaard (E1)</text><line x1="575.8" y1="48.0" x2="597.3" y2="48.0" class="ci"/><line x1="575.8" y1="44.0" x2="575.8" y2="52.0" class="ci"/><line x1="597.3" y1="44.0" x2="597.3" y2="52.0" class="ci"/><circle cx="587.9" cy="48.0" r="4.2" class="pt-vol"/><line x1="398.8" y1="62.0" x2="459.2" y2="62.0" class="ci"/><line x1="398.8" y1="58.0" x2="398.8" y2="66.0" class="ci"/><line x1="459.2" y1="58.0" x2="459.2" y2="66.0" class="ci"/><circle cx="430.4" cy="62.0" r="4.2" class="pt-open"/><text x="198" y="105" text-anchor="end" class="lb">Tegen blind oordeel (E0)</text><line x1="561.8" y1="94.0" x2="591.0" y2="94.0" class="ci"/><line x1="561.8" y1="90.0" x2="561.8" y2="98.0" class="ci"/><line x1="591.0" y1="90.0" x2="591.0" y2="98.0" class="ci"/><circle cx="577.4" cy="94.0" r="4.2" class="pt-vol"/><line x1="414.4" y1="108.0" x2="482.6" y2="108.0" class="ci"/><line x1="414.4" y1="104.0" x2="414.4" y2="112.0" class="ci"/><line x1="482.6" y1="104.0" x2="482.6" y2="112.0" class="ci"/><circle cx="449.1" cy="108.0" r="4.2" class="pt-open"/><line x1="210.0" y1="132" x2="600.0" y2="132" class="ax"/><line x1="210.0" y1="132" x2="210.0" y2="136" class="ax"/><text x="210.0" y="148" text-anchor="middle" class="tk">0</text><line x1="288.0" y1="132" x2="288.0" y2="136" class="ax"/><text x="288.0" y="148" text-anchor="middle" class="tk">20</text><line x1="366.0" y1="132" x2="366.0" y2="136" class="ax"/><text x="366.0" y="148" text-anchor="middle" class="tk">40</text><line x1="444.0" y1="132" x2="444.0" y2="136" class="ax"/><text x="444.0" y="148" text-anchor="middle" class="tk">60</text><line x1="522.0" y1="132" x2="522.0" y2="136" class="ax"/><text x="522.0" y="148" text-anchor="middle" class="tk">80</text><line x1="600.0" y1="132" x2="600.0" y2="136" class="ax"/><text x="600.0" y="148" text-anchor="middle" class="tk">100</text><text x="405.0" y="164" text-anchor="middle" class="at">Recall (%)</text></svg><figcaption><strong>Figuur 1.</strong> Recall van het systeem (●) en van het zorgplan (○) met 95%-betrouwbaarheidsinterval (cluster-bootstrap per kaart). Stippellijn: vooraf vastgelegd succescriterium.</figcaption></figure>
+
+<figure class="fig-verslag"><svg viewBox="0 0 640 294" role="img" aria-label="Recall per categorie"><circle cx="230.0" cy="14.0" r="4.2" class="pt-vol"/><text x="240" y="18" class="tk">Systeem</text><circle cx="310.0" cy="14.0" r="4.2" class="pt-open"/><text x="320" y="18" class="tk">Zorgplan</text><line x1="563.0" y1="28" x2="563.0" y2="250" class="crit"/><text x="567.0" y="36" class="tk">90%</text><text x="218" y="59" text-anchor="end" class="lb">Indicatie (n = 66)</text><line x1="570.0" y1="48.0" x2="599.0" y2="48.0" class="ci"/><line x1="570.0" y1="44.0" x2="570.0" y2="52.0" class="ci"/><line x1="599.0" y1="44.0" x2="599.0" y2="52.0" class="ci"/><circle cx="594.4" cy="48.0" r="4.2" class="pt-vol"/><line x1="350.7" y1="62.0" x2="436.9" y2="62.0" class="ci"/><line x1="350.7" y1="58.0" x2="350.7" y2="66.0" class="ci"/><line x1="436.9" y1="58.0" x2="436.9" y2="66.0" class="ci"/><circle cx="392.6" cy="62.0" r="4.2" class="pt-open"/><text x="218" y="101" text-anchor="end" class="lb">Vorige zwangerschap (n = 38)</text><line x1="566.0" y1="90.0" x2="600.0" y2="90.0" class="ci"/><line x1="566.0" y1="86.0" x2="566.0" y2="94.0" class="ci"/><line x1="600.0" y1="86.0" x2="600.0" y2="94.0" class="ci"/><circle cx="600.0" cy="90.0" r="4.2" class="pt-vol"/><line x1="434.4" y1="104.0" x2="537.1" y2="104.0" class="ci"/><line x1="434.4" y1="100.0" x2="434.4" y2="108.0" class="ci"/><line x1="537.1" y1="100.0" x2="537.1" y2="108.0" class="ci"/><circle cx="492.9" cy="104.0" r="4.2" class="pt-open"/><text x="218" y="143" text-anchor="end" class="lb">Huidige zwangerschap (n = 25)</text><line x1="550.7" y1="132.0" x2="600.0" y2="132.0" class="ci"/><line x1="550.7" y1="128.0" x2="550.7" y2="136.0" class="ci"/><line x1="600.0" y1="128.0" x2="600.0" y2="136.0" class="ci"/><circle cx="600.0" cy="132.0" r="4.2" class="pt-vol"/><line x1="367.1" y1="146.0" x2="501.3" y2="146.0" class="ci"/><line x1="367.1" y1="142.0" x2="367.1" y2="150.0" class="ci"/><line x1="501.3" y1="142.0" x2="501.3" y2="150.0" class="ci"/><circle cx="437.2" cy="146.0" r="4.2" class="pt-open"/><text x="218" y="185" text-anchor="end" class="lb">Medische voorgeschiedenis (n = 20)</text><line x1="466.6" y1="174.0" x2="580.6" y2="174.0" class="ci"/><line x1="466.6" y1="170.0" x2="466.6" y2="178.0" class="ci"/><line x1="580.6" y1="170.0" x2="580.6" y2="178.0" class="ci"/><circle cx="544.5" cy="174.0" r="4.2" class="pt-vol"/><line x1="390.2" y1="188.0" x2="533.0" y2="188.0" class="ci"/><line x1="390.2" y1="184.0" x2="390.2" y2="192.0" class="ci"/><line x1="533.0" y1="184.0" x2="533.0" y2="192.0" class="ci"/><circle cx="470.5" cy="188.0" r="4.2" class="pt-open"/><text x="218" y="227" text-anchor="end" class="lb">Overig (n = 12)</text><line x1="469.1" y1="216.0" x2="594.5" y2="216.0" class="ci"/><line x1="469.1" y1="212.0" x2="469.1" y2="220.0" class="ci"/><line x1="594.5" y1="212.0" x2="594.5" y2="220.0" class="ci"/><circle cx="569.2" cy="216.0" r="4.2" class="pt-vol"/><line x1="374.5" y1="230.0" x2="548.9" y2="230.0" class="ci"/><line x1="374.5" y1="226.0" x2="374.5" y2="234.0" class="ci"/><line x1="548.9" y1="226.0" x2="548.9" y2="234.0" class="ci"/><circle cx="476.7" cy="230.0" r="4.2" class="pt-open"/><line x1="230.0" y1="250" x2="600.0" y2="250" class="ax"/><line x1="230.0" y1="250" x2="230.0" y2="254" class="ax"/><text x="230.0" y="266" text-anchor="middle" class="tk">0</text><line x1="304.0" y1="250" x2="304.0" y2="254" class="ax"/><text x="304.0" y="266" text-anchor="middle" class="tk">20</text><line x1="378.0" y1="250" x2="378.0" y2="254" class="ax"/><text x="378.0" y="266" text-anchor="middle" class="tk">40</text><line x1="452.0" y1="250" x2="452.0" y2="254" class="ax"/><text x="452.0" y="266" text-anchor="middle" class="tk">60</text><line x1="526.0" y1="250" x2="526.0" y2="254" class="ax"/><text x="526.0" y="266" text-anchor="middle" class="tk">80</text><line x1="600.0" y1="250" x2="600.0" y2="254" class="ax"/><text x="600.0" y="266" text-anchor="middle" class="tk">100</text><text x="415.0" y="282" text-anchor="middle" class="at">Recall (%)</text></svg><figcaption><strong>Figuur 2.</strong> Recall per categorie van het systeem (●) en het zorgplan (○), tegen de gouden standaard (E1), met 95%-betrouwbaarheidsinterval (Wilson). De aantallen per categorie zijn klein.</figcaption></figure>
+
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Categorie</th>
+<th>Positief (E1)</th>
+<th>Systeem, recall (95%-BI)</th>
+<th>Zorgplan, recall (95%-BI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Indicatie</td>
+<td>66</td>
+<td>65/66 · 98,5% (91,9–99,7)</td>
+<td>29/66 · 43,9% (32,6–55,9)</td>
+</tr>
+<tr>
+<td>Vorige zwangerschap, bevalling of kraamtijd</td>
+<td>38</td>
+<td>38/38 · 100,0% (90,8–100,0)</td>
+<td>27/38 · 71,1% (55,2–83,0)</td>
+</tr>
+<tr>
+<td>Huidige zwangerschap</td>
+<td>25</td>
+<td>25/25 · 100,0% (86,7–100,0)</td>
+<td>14/25 · 56,0% (37,1–73,3)</td>
+</tr>
+<tr>
+<td>Medische voorgeschiedenis</td>
+<td>20</td>
+<td>17/20 · 85,0% (64,0–94,8)</td>
+<td>13/20 · 65,0% (43,3–81,9)</td>
+</tr>
+<tr>
+<td>Overig</td>
+<td>12</td>
+<td>11/12 · 91,7% (64,6–98,5)</td>
+<td>8/12 · 66,7% (39,1–86,2)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recall per categorie.</strong> In alle vijf categorieën lag de recall van het systeem boven die van het zorgplan (figuur 2).
+De laagste recall had de categorie medische voorgeschiedenis: 85,0% (17 van 20; 95%-BI 64,0–94,8%). Omdat elke categorie
+weinig positieve aandachtspunten bevat, zijn de intervallen breed: in deze categorie verandert één aandachtspunt meer of
+minder de recall met vijf procentpunt. De drie missers in deze categorie (HIV, chronische hypertensie en herhaalde
+miskramen) hebben elk een aanwijsbare oorzaak en worden in §4 besproken.</p>
+<div class="kop-blok"><h3 id="33-overeenstemming-tussen-de-gynaecologen">3.3 Overeenstemming tussen de gynaecologen</h3>
+<p>Over 3.480 beoordelingen: positive agreement 82,1% (76,3–86,6%), kappa 0,81 (0,76–0,86). Per categorie varieerde kappa
+van 0,74 (indicatie) tot 0,90 (vorige zwangerschap). Van de 51 verschillen betrof een groot deel de samengestelde
+aandachtspunten (risicofactoren pre-eclampsie en diabetes gravidarum), waar de toepassing van de factorlijst verschilde.</p></div>
+<div class="kop-blok"><h3 id="34-systeem-en-zorgplan">3.4 Systeem en zorgplan</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Referentie</th>
+<th>Recall systeem</th>
+<th>Recall zorgplan</th>
+<th>Verschil (95%-BI)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>96,9%</td>
+<td>56,5% (48,4–63,9%)</td>
+<td>40,4 procentpunt (33,1–48,4)</td>
+</tr>
+<tr>
+<td>E0</td>
+<td>94,2%</td>
+<td>61,3% (52,4–69,9%)</td>
+<td>32,8 procentpunt (24,8–40,9)</td>
+</tr>
+</tbody>
+</table></div></div>
+<figure class="fig-verslag"><svg viewBox="0 0 640 132" role="img" aria-label="Verdeling van de aandachtspunten"><rect x="20.0" y="14" width="335.4" height="34" class="f1"/><text x="187.7" y="36" text-anchor="middle" class="tk-inv">90</text><rect x="355.4" y="14" width="246.0" height="34" class="f2"/><text x="478.4" y="36" text-anchor="middle" class="tk">66</text><rect x="601.4" y="14" width="3.7" height="34" class="f3"/><rect x="605.1" y="14" width="14.9" height="34" class="f4"/><line x1="20.0" y1="48" x2="616.2732919254659" y2="48" class="ax"/><line x1="20.0" y1="48" x2="20.0" y2="52" class="ax"/><text x="20.0" y="64" text-anchor="middle" class="tk">0</text><line x1="169.06832298136646" y1="48" x2="169.06832298136646" y2="52" class="ax"/><text x="169.06832298136646" y="64" text-anchor="middle" class="tk">40</text><line x1="318.1366459627329" y1="48" x2="318.1366459627329" y2="52" class="ax"/><text x="318.1366459627329" y="64" text-anchor="middle" class="tk">80</text><line x1="467.2049689440994" y1="48" x2="467.2049689440994" y2="52" class="ax"/><text x="467.2049689440994" y="64" text-anchor="middle" class="tk">120</text><line x1="616.2732919254659" y1="48" x2="616.2732919254659" y2="52" class="ax"/><text x="616.2732919254659" y="64" text-anchor="middle" class="tk">160</text><text x="318.1366459627329" y="80" text-anchor="middle" class="at">Aantal aandachtspunten (gouden standaard, n = 161)</text><rect x="20" y="108" width="11" height="11" class="f1"/><text x="36" y="118" class="tk">Beide (90)</text><rect x="170" y="108" width="11" height="11" class="f2"/><text x="186" y="118" class="tk">Alleen systeem (66)</text><rect x="320" y="108" width="11" height="11" class="f3"/><text x="336" y="118" class="tk">Alleen zorgplan (1)</text><rect x="470" y="108" width="11" height="11" class="f4"/><text x="486" y="118" class="tk">Geen van beide (4)</text></svg><figcaption><strong>Figuur 3.</strong> Door wie de 161 aandachtspunten in de gouden standaard werden gevonden: door systeem en zorgplan, alleen door het systeem, alleen door het zorgplan, of door geen van beide.</figcaption></figure>
+
+<p>Precisie van het zorgplan tegen E1: 85,8%. Zorgplan en systeem samen bevatten 97,5% van de aandachtspunten in E1
+(157/161); 4 aandachtspunten ontbraken in beide.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>E1</th>
+<th>ZP</th>
+<th>M</th>
+<th>Betekenis</th>
+<th>Aantal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>beide gevonden</td>
+<td>90</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>systeem vond wat het zorgplan niet vastlegde</td>
+<td>66</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>zorgplan vond wat het systeem miste</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>beide gemist</td>
+<td>4</td>
+</tr>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>onterecht getoond door het systeem</td>
+<td>119</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>zorgplanpunt dat de experts niet uit de kaart halen</td>
+<td>11</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>beide onterecht</td>
+<td>4</td>
+</tr>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>terecht negatief</td>
+<td>3.185</td>
+</tr>
+</tbody>
+</table></div>
+<div class="kop-blok"><h3 id="35-van-blind-oordeel-naar-gouden-standaard">3.5 Van blind oordeel naar gouden standaard</h3>
+<p>Na inzage wijzigden de gynaecologen 30 van de 3.480 beoordelingen (0,9%): 27 van 0 naar 1 en 3 van 1 naar 0. Aanleiding:
+systeemuitvoer (20) of systeemuitvoer en zorgplan (10). Reden: gemist bij het lezen (23), andere interpretatie van de
+definitie (5), passage of zorgplan overtuigend (2).</p></div>
+<p><strong>Aanvullende signalering.</strong> In 27 gevallen toonde het systeem een aandachtspunt dat de gynaecologen in hun blinde
+beoordeling hadden gemist en na inzage bevestigden (67,5 per 100 kaarten; 45,0–90,0). In 19 daarvan ontbrak het
+aandachtspunt ook in het zorgplan (47,5 per 100 kaarten; 27,5–70,0). Op 35 van de 40 kaarten (87,5%) toonde het systeem
+minstens één bevestigd aandachtspunt dat in het zorgplan ontbrak.</p>
+<div class="kop-blok"><h3 id="36-onterecht-getoonde-aandachtspunten">3.6 Onterecht getoonde aandachtspunten</h3>
+<p>Gemiddeld 3,1 per kaart (123 in totaal; PPV 55,9%, 50,5–61,8%). Ze waren geconcentreerd in een beperkt aantal
+aandachtspunten; de drie grootste (trombose en trombofilie, congenitale afwijking bij een eerder kind, (sub)totaalruptuur
+in de anamnese) waren samen goed voor 35 van de 123.</p></div>
+<div class="kop-blok"><h3 id="37-rangschikking-door-het-relevantiefilter">3.7 Rangschikking door het relevantiefilter</h3>
+<p>Het relevantiefilter ordent passages naar hun relevantie voor het aandachtspunt; alleen passages boven de vooraf
+vastgelegde instelling komen in het rapport. Hoe goed die rangschikking terechte van onterechte aandachtspunten scheidt,
+is beschrijvend weergegeven met de oppervlakte onder de ROC-curve en de precision-recall-curve (protocol §6).</p></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Referentie</th>
+<th>ROC-AUC (95%-BI)</th>
+<th>PR-AUC (95%-BI)</th>
+<th>Prevalentie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>0,990 (0,979–0,996)</td>
+<td>0,903 (0,872–0,933)</td>
+<td>4,6%</td>
+</tr>
+<tr>
+<td>E0</td>
+<td>0,984 (0,971–0,991)</td>
+<td>0,753 (0,676–0,830)</td>
+<td>3,9%</td>
+</tr>
+</tbody>
+</table></div>
+<figure class="fig-verslag"><div class="fig-twee"><svg viewBox="0 0 300 300" role="img" aria-label="ROC-curve (AUC 0,990)"><text x="4" y="14" class="pl">A</text><text x="52" y="14" class="lb">ROC-curve (AUC 0,990)</text><line x1="52" y1="248" x2="280" y2="248" class="ax"/><line x1="52" y1="248" x2="52" y2="20" class="ax"/><line x1="52" y1="248" x2="52" y2="252" class="ax"/><text x="52" y="264" text-anchor="middle" class="tk">0</text><line x1="48" y1="248" x2="52" y2="248" class="ax"/><text x="45" y="252" text-anchor="end" class="tk">0</text><line x1="97.6" y1="248" x2="97.6" y2="252" class="ax"/><text x="97.6" y="264" text-anchor="middle" class="tk">0,2</text><line x1="48" y1="202.4" x2="52" y2="202.4" class="ax"/><text x="45" y="206.4" text-anchor="end" class="tk">0,2</text><line x1="143.2" y1="248" x2="143.2" y2="252" class="ax"/><text x="143.2" y="264" text-anchor="middle" class="tk">0,4</text><line x1="48" y1="156.8" x2="52" y2="156.8" class="ax"/><text x="45" y="160.8" text-anchor="end" class="tk">0,4</text><line x1="188.79999999999998" y1="248" x2="188.79999999999998" y2="252" class="ax"/><text x="188.79999999999998" y="264" text-anchor="middle" class="tk">0,6</text><line x1="48" y1="111.20000000000002" x2="52" y2="111.20000000000002" class="ax"/><text x="45" y="115.20000000000002" text-anchor="end" class="tk">0,6</text><line x1="234.4" y1="248" x2="234.4" y2="252" class="ax"/><text x="234.4" y="264" text-anchor="middle" class="tk">0,8</text><line x1="48" y1="65.6" x2="52" y2="65.6" class="ax"/><text x="45" y="69.6" text-anchor="end" class="tk">0,8</text><line x1="280" y1="248" x2="280" y2="252" class="ax"/><text x="280" y="264" text-anchor="middle" class="tk">1</text><line x1="48" y1="20" x2="52" y2="20" class="ax"/><text x="45" y="24" text-anchor="end" class="tk">1</text><text x="166.0" y="292" text-anchor="middle" class="at">1 − specificiteit</text><text transform="translate(14,134.0) rotate(-90)" text-anchor="middle" class="at">Sensitiviteit (recall)</text><line x1="52" y1="248" x2="280" y2="20" class="crit"/><polyline class="curve" points="52.0,248.0 52.0,191.4 52.0,188.5 52.0,185.7 52.0,180.0 52.0,178.6 52.0,175.8 52.0,174.4 52.0,172.9 52.0,170.1 52.0,165.9 52.0,164.4 52.0,161.6 52.0,160.2 52.0,157.4 52.0,154.5 52.0,151.7 52.0,150.3 52.1,150.3 52.1,148.9 52.1,147.5 52.1,146.0 52.1,144.6 52.1,143.2 52.1,141.8 52.2,141.8 52.2,138.9 52.2,137.5 52.2,136.1 52.2,134.7 52.2,133.3 52.2,131.9 52.3,131.9 52.3,130.5 52.3,129.1 52.3,127.6 52.3,127.6 52.3,126.2 52.3,123.4 52.3,122.0 52.4,120.5 52.5,117.7 52.5,116.3 52.5,114.9 52.5,114.9 52.5,113.5 52.5,112.0 52.5,107.8 52.5,106.4 52.6,106.4 52.7,105.0 52.7,103.6 52.7,102.1 52.8,102.1 52.8,100.7 52.8,99.3 52.8,97.9 52.8,97.9 52.8,96.5 52.8,95.1 52.9,95.1 52.9,93.6 53.0,93.6 53.0,92.2 53.0,89.4 53.0,88.0 53.0,86.6 53.0,85.1 53.0,83.7 53.0,82.3 53.0,80.9 53.0,79.5 53.2,79.5 53.2,78.1 53.2,76.6 53.2,75.2 53.2,73.8 53.2,73.8 53.2,72.4 53.3,72.4 53.3,71.0 53.3,69.6 53.4,69.6 53.4,69.6 53.5,69.6 53.7,69.6 53.8,69.6 53.8,68.2 53.8,66.7 53.8,65.3 53.8,63.9 53.8,62.5 53.8,62.5 53.9,62.5 54.0,61.1 54.0,59.6 54.1,59.6 54.1,59.6 54.1,58.2 54.2,58.2 54.3,58.2 54.3,58.2 54.4,58.2 54.5,58.2 54.5,56.8 54.5,56.8 54.6,56.8 54.7,56.8 54.8,56.8 54.8,56.8 54.9,56.8 55.0,56.8 55.0,55.4 55.1,55.4 55.1,54.0 55.2,54.0 55.2,52.6 55.2,51.1 55.2,51.1 55.3,51.1 55.4,51.1 55.4,49.7 55.4,48.3 55.4,48.3 55.4,46.9 55.4,45.5 55.5,45.5 55.6,45.5 55.6,44.1 55.6,44.1 55.7,44.1 55.8,44.1 55.9,44.1 55.9,44.1 56.0,44.1 56.0,42.7 56.1,42.7 56.1,42.7 56.1,41.2 56.2,41.2 56.3,41.2 56.3,41.2 56.4,41.2 56.5,41.2 56.5,41.2 56.5,39.8 56.6,37.0 56.6,35.6 56.7,35.6 56.7,35.6 56.8,35.6 56.9,35.6 56.9,35.6 57.0,35.6 57.1,35.6 57.2,35.6 57.2,35.6 57.3,35.6 57.4,35.6 57.4,35.6 57.5,35.6 57.6,35.6 57.6,35.6 57.7,35.6 57.8,35.6 57.8,35.6 57.9,35.6 57.9,34.2 58.0,34.2 58.0,34.2 58.1,34.2 58.2,34.2 58.2,34.2 58.3,34.2 58.3,32.7 58.4,32.7 58.4,31.3 58.5,31.3 58.5,31.3 58.6,31.3 58.7,31.3 58.7,31.3 58.8,31.3 58.9,31.3 58.9,29.9 58.9,28.5 58.9,28.5 59.0,28.5 59.1,28.5 59.1,28.5 59.2,28.5 59.3,28.5 59.3,28.5 59.4,28.5 59.5,28.5 59.5,28.5 59.5,27.1 59.6,27.1 59.7,27.1 59.8,27.1 59.8,27.1 59.9,27.1 60.0,27.1 60.0,27.1 60.1,27.1 60.2,27.1 60.3,27.1 60.3,27.1 60.4,27.1 60.5,27.1 60.7,27.1 60.8,27.1 60.9,27.1 60.9,27.1 61.0,27.1 61.1,27.1 61.1,27.1 61.2,27.1 61.3,27.1 61.3,27.1 61.4,27.1 61.5,27.1 61.5,25.7 61.6,25.7 61.6,25.7 61.7,25.7 61.8,25.7 61.8,25.7 61.9,25.7 62.0,25.7 62.0,25.7 62.1,25.7 62.2,25.7 62.2,25.7 62.3,25.7 62.4,25.7 62.4,25.7 62.5,25.7 62.6,25.7 62.7,25.7 62.7,24.2 62.8,24.2 62.9,24.2 62.9,24.2 63.0,24.2 63.1,24.2 63.1,24.2 63.2,24.2 63.3,24.2 63.3,24.2 63.4,24.2 63.5,24.2 63.5,24.2 63.6,24.2 63.7,24.2 63.7,24.2 63.8,24.2 63.9,24.2 63.9,24.2 64.0,24.2 64.1,24.2 64.2,24.2 64.2,24.2 64.3,24.2 64.4,24.2 64.5,22.8 64.6,22.8 64.6,22.8 64.7,22.8 64.8,22.8 64.8,22.8 64.9,22.8 65.0,22.8 65.1,22.8 65.2,22.8 65.3,22.8 65.3,22.8 65.4,22.8 65.5,22.8 65.5,22.8 65.6,22.8 65.7,22.8 65.7,22.8 65.8,22.8 65.9,22.8 66.0,22.8 66.0,22.8 66.1,22.8 66.2,22.8 66.2,22.8 66.3,22.8 66.4,22.8 66.5,22.8 66.6,22.8 66.6,22.8 66.7,22.8 66.8,22.8 66.8,22.8 66.9,22.8 67.0,22.8 67.0,22.8 67.1,22.8 67.2,22.8 67.3,22.8 67.4,22.8 67.5,22.8 67.5,22.8 67.6,22.8 67.7,22.8 67.7,22.8 67.8,22.8 67.9,22.8 67.9,22.8 68.0,22.8 68.1,22.8 68.1,22.8 68.3,22.8 68.3,22.8 68.4,22.8 68.6,22.8 68.6,22.8 68.7,22.8 68.8,22.8 68.9,22.8 69.0,22.8 69.1,22.8 69.2,22.8 69.2,22.8 69.3,22.8 69.4,22.8 69.4,22.8 69.5,22.8 69.6,22.8 69.6,22.8 69.8,22.8 69.9,22.8 69.9,22.8 70.0,22.8 70.1,22.8 70.3,22.8 70.3,22.8 70.4,22.8 70.5,22.8 70.6,22.8 70.7,22.8 70.8,22.8 70.9,22.8 71.0,22.8 71.0,22.8 71.1,22.8 71.2,22.8 71.2,22.8 71.4,22.8 71.4,22.8 71.6,22.8 71.7,22.8 71.9,22.8 72.0,22.8 72.1,22.8 72.1,22.8 72.2,22.8 72.3,22.8 72.6,22.8 72.7,22.8 73.0,22.8 73.0,22.8 73.4,22.8 73.4,22.8 73.6,22.8 73.6,22.8 73.8,22.8 74.0,22.8 74.3,22.8 74.3,22.8 74.5,22.8 74.6,22.8 74.7,22.8 75.0,22.8 75.1,22.8 75.2,22.8 75.5,22.8 75.6,22.8 75.6,22.8 75.7,22.8 75.8,22.8 75.9,22.8 76.2,22.8 76.4,22.8 76.6,22.8 76.8,22.8 77.1,22.8 77.4,22.8 77.6,22.8 77.8,22.8 78.0,22.8 78.4,22.8 78.6,22.8 79.0,22.8 79.5,21.4 79.9,21.4 80.2,21.4 80.4,21.4 80.7,21.4 81.3,21.4 81.8,21.4 82.0,21.4 82.3,21.4 82.6,21.4 83.7,21.4 84.1,21.4 85.0,21.4 85.8,21.4 86.5,21.4 87.2,21.4 88.1,21.4 89.2,21.4 90.4,21.4 91.4,21.4 93.2,21.4 95.2,21.4 98.3,21.4 100.7,21.4 103.7,21.4 108.6,21.4 115.7,21.4 124.5,21.4 140.3,21.4 280.0,20.0"/><circle cx="60.4" cy="27.1" r="4.5" class="pt-open"/></svg><svg viewBox="0 0 300 300" role="img" aria-label="Precision-recall-curve (AUC 0,903)"><text x="4" y="14" class="pl">B</text><text x="52" y="14" class="lb">Precision-recall-curve (AUC 0,903)</text><line x1="52" y1="248" x2="280" y2="248" class="ax"/><line x1="52" y1="248" x2="52" y2="20" class="ax"/><line x1="52" y1="248" x2="52" y2="252" class="ax"/><text x="52" y="264" text-anchor="middle" class="tk">0</text><line x1="48" y1="248" x2="52" y2="248" class="ax"/><text x="45" y="252" text-anchor="end" class="tk">0</text><line x1="97.6" y1="248" x2="97.6" y2="252" class="ax"/><text x="97.6" y="264" text-anchor="middle" class="tk">0,2</text><line x1="48" y1="202.4" x2="52" y2="202.4" class="ax"/><text x="45" y="206.4" text-anchor="end" class="tk">0,2</text><line x1="143.2" y1="248" x2="143.2" y2="252" class="ax"/><text x="143.2" y="264" text-anchor="middle" class="tk">0,4</text><line x1="48" y1="156.8" x2="52" y2="156.8" class="ax"/><text x="45" y="160.8" text-anchor="end" class="tk">0,4</text><line x1="188.79999999999998" y1="248" x2="188.79999999999998" y2="252" class="ax"/><text x="188.79999999999998" y="264" text-anchor="middle" class="tk">0,6</text><line x1="48" y1="111.20000000000002" x2="52" y2="111.20000000000002" class="ax"/><text x="45" y="115.20000000000002" text-anchor="end" class="tk">0,6</text><line x1="234.4" y1="248" x2="234.4" y2="252" class="ax"/><text x="234.4" y="264" text-anchor="middle" class="tk">0,8</text><line x1="48" y1="65.6" x2="52" y2="65.6" class="ax"/><text x="45" y="69.6" text-anchor="end" class="tk">0,8</text><line x1="280" y1="248" x2="280" y2="252" class="ax"/><text x="280" y="264" text-anchor="middle" class="tk">1</text><line x1="48" y1="20" x2="52" y2="20" class="ax"/><text x="45" y="24" text-anchor="end" class="tk">1</text><text x="166.0" y="292" text-anchor="middle" class="at">Recall</text><text transform="translate(14,134.0) rotate(-90)" text-anchor="middle" class="at">Precisie (PPV)</text><polyline class="curve" points="108.6,20.0 111.5,20.0 114.3,20.0 120.0,20.0 121.4,20.0 124.2,20.0 125.6,20.0 127.1,20.0 129.9,20.0 134.1,20.0 135.6,20.0 138.4,20.0 139.8,20.0 142.6,20.0 145.5,20.0 148.3,20.0 149.7,20.0 149.7,23.3 151.1,23.2 152.5,26.2 154.0,26.2 155.4,26.1 156.8,26.0 158.2,25.9 158.2,28.8 161.1,28.5 162.5,28.4 163.9,28.3 165.3,28.2 166.7,28.1 168.1,28.0 168.1,30.6 169.5,30.5 170.9,30.4 172.4,30.2 172.4,32.7 173.8,32.5 176.6,32.3 178.0,32.1 179.5,34.2 182.3,36.1 183.7,36.0 185.1,35.8 185.1,37.9 186.5,37.7 188.0,37.5 192.2,37.1 193.6,36.9 193.6,38.8 195.0,40.5 196.4,40.4 197.9,40.2 197.9,42.0 199.3,41.8 200.7,41.6 202.1,41.4 202.1,43.2 203.5,43.0 204.9,42.8 204.9,44.5 206.4,44.3 206.4,45.9 207.8,45.7 210.6,45.3 212.0,45.1 213.4,44.9 214.9,44.7 216.3,44.6 217.7,44.4 219.1,44.2 220.5,45.5 220.5,48.5 221.9,48.3 223.4,48.1 224.8,47.9 226.2,47.7 226.2,49.1 227.6,48.9 227.6,50.3 229.0,50.1 230.4,49.9 230.4,51.2 230.4,52.6 230.4,53.9 230.4,57.8 230.4,59.0 231.8,58.7 233.3,58.5 234.7,58.2 236.1,58.0 237.5,57.8 237.5,59.0 237.5,60.2 238.9,61.1 240.4,60.8 240.4,62.0 240.4,63.1 241.8,62.8 241.8,64.0 241.8,65.1 241.8,66.1 241.8,67.2 241.8,68.3 243.2,68.0 243.2,69.0 243.2,70.1 243.2,71.1 243.2,72.1 243.2,73.1 243.2,74.1 243.2,75.1 244.6,75.7 244.6,76.7 246.0,76.4 246.0,77.3 247.4,77.0 248.9,76.7 248.9,77.6 248.9,78.5 248.9,79.4 250.3,79.1 251.7,78.8 251.7,79.7 253.1,79.4 254.5,79.1 254.5,79.9 254.5,80.8 255.9,80.5 255.9,81.3 255.9,82.2 255.9,83.0 255.9,83.8 255.9,84.7 255.9,85.5 257.3,85.1 257.3,85.9 257.3,86.7 258.8,86.4 258.8,87.2 258.8,88.0 258.8,88.7 258.8,89.5 258.8,90.2 258.8,91.0 260.2,90.7 263.0,90.7 264.4,90.4 264.4,91.1 264.4,91.8 264.4,92.5 264.4,93.3 264.4,93.9 264.4,94.6 264.4,95.3 264.4,96.0 264.4,96.7 264.4,97.3 264.4,98.0 264.4,98.7 264.4,99.3 264.4,99.9 264.4,100.6 264.4,101.2 264.4,101.9 264.4,102.5 264.4,103.1 265.8,102.7 265.8,103.3 265.8,103.9 265.8,104.5 265.8,105.1 265.8,105.7 265.8,106.3 267.3,106.0 267.3,106.5 268.7,106.2 268.7,106.8 268.7,107.3 268.7,107.9 268.7,108.5 268.7,109.0 268.7,109.6 268.7,110.1 270.1,109.8 271.5,109.4 271.5,109.9 271.5,110.5 271.5,111.0 271.5,111.5 271.5,112.1 271.5,112.6 271.5,113.1 271.5,113.6 271.5,114.1 271.5,114.6 272.9,114.3 272.9,114.8 272.9,115.3 272.9,115.8 272.9,116.3 272.9,116.8 272.9,117.2 272.9,117.7 272.9,118.2 272.9,118.7 272.9,119.1 272.9,119.6 272.9,120.0 272.9,120.5 272.9,122.3 272.9,122.8 272.9,123.2 272.9,123.6 272.9,124.1 272.9,124.5 272.9,124.9 272.9,125.4 272.9,125.8 272.9,126.2 272.9,126.6 272.9,127.0 274.3,126.7 274.3,127.1 274.3,127.5 274.3,127.9 274.3,128.3 274.3,128.7 274.3,129.1 274.3,129.5 274.3,129.9 274.3,130.3 274.3,130.6 274.3,131.0 274.3,131.4 274.3,131.8 274.3,132.2 274.3,132.5 274.3,132.9 274.3,133.6 275.8,133.3 275.8,133.6 275.8,134.0 275.8,134.4 275.8,134.7 275.8,135.1 275.8,135.4 275.8,135.8 275.8,136.1 275.8,136.5 275.8,136.8 275.8,137.1 275.8,137.5 275.8,137.8 275.8,138.2 275.8,138.5 275.8,138.8 275.8,139.2 275.8,139.5 275.8,139.8 275.8,140.1 275.8,140.5 275.8,140.8 275.8,141.1 275.8,141.4 277.2,141.7 277.2,142.0 277.2,142.3 277.2,142.6 277.2,142.9 277.2,143.2 277.2,143.5 277.2,143.8 277.2,144.4 277.2,144.7 277.2,145.0 277.2,145.3 277.2,145.6 277.2,145.9 277.2,146.2 277.2,146.4 277.2,146.7 277.2,147.0 277.2,147.3 277.2,147.6 277.2,147.9 277.2,148.1 277.2,148.4 277.2,148.7 277.2,149.0 277.2,149.2 277.2,149.5 277.2,150.0 277.2,150.3 277.2,150.6 277.2,150.8 277.2,151.1 277.2,151.3 277.2,151.6 277.2,151.8 277.2,152.1 277.2,152.4 277.2,152.6 277.2,152.9 277.2,153.4 277.2,153.6 277.2,153.8 277.2,154.1 277.2,154.3 277.2,154.6 277.2,154.8 277.2,155.0 277.2,155.3 277.2,155.5 277.2,155.8 277.2,156.0 277.2,156.5 277.2,156.7 277.2,156.9 277.2,157.4 277.2,157.6 277.2,157.8 277.2,158.1 277.2,158.5 277.2,158.7 277.2,159.1 277.2,159.4 277.2,159.6 277.2,159.8 277.2,160.0 277.2,160.2 277.2,160.4 277.2,160.7 277.2,160.9 277.2,161.3 277.2,161.5 277.2,161.7 277.2,161.9 277.2,162.1 277.2,162.7 277.2,162.9 277.2,163.1 277.2,163.5 277.2,163.7 277.2,163.9 277.2,164.1 277.2,164.5 277.2,164.7 277.2,164.8 277.2,165.1 277.2,165.2 277.2,165.4 277.2,165.8 277.2,166.0 277.2,166.4 277.2,166.7 277.2,167.3 277.2,167.4 277.2,167.6 277.2,167.8 277.2,168.0 277.2,168.3 277.2,169.0 277.2,169.2 277.2,169.9 277.2,170.0 277.2,170.9 277.2,171.0 277.2,171.3 277.2,171.5 277.2,171.8 277.2,172.5 277.2,172.9 277.2,173.1 277.2,173.6 277.2,173.7 277.2,174.0 277.2,174.6 277.2,174.9 277.2,175.1 277.2,175.6 277.2,175.8 277.2,175.9 277.2,176.1 277.2,176.4 277.2,176.5 277.2,177.0 277.2,177.5 277.2,177.9 277.2,178.3 277.2,178.8 277.2,179.3 277.2,179.7 277.2,180.2 277.2,180.6 277.2,181.2 277.2,181.6 277.2,182.3 278.6,183.0 278.6,183.5 278.6,184.0 278.6,184.3 278.6,184.9 278.6,185.8 278.6,186.5 278.6,186.9 278.6,187.3 278.6,187.7 278.6,189.3 278.6,189.9 278.6,191.0 278.6,192.0 278.6,192.9 278.6,193.8 278.6,194.8 278.6,196.0 278.6,197.3 278.6,198.3 278.6,200.0 278.6,201.8 278.6,204.3 278.6,206.0 278.6,208.1 278.6,210.9 278.6,214.5 278.6,218.0 278.6,222.8 280.0,237.4"/><circle cx="272.9" cy="120.5" r="4.5" class="pt-open"/></svg></div><figcaption><strong>Figuur 4.</strong> Rangschikking door het relevantiefilter, tegen de gouden standaard (E1). ○: werkpunt van het systeem zoals het draait (recall 96,9%, PPV 55,9%). Stippellijn in A: willekeurige rangschikking.</figcaption></figure>
+
+<p>Bij een lage prevalentie is de PR-AUC de meest informatieve maat; het gokniveau is gelijk aan de prevalentie. Dat de
+PR-AUC tegen E0 lager uitvalt, komt grotendeels door de 27 aandachtspunten die de gynaecologen in hun blinde beoordeling
+misten en na inzage bevestigden (§3.5): tegen E0 tellen die als onterecht getoond. In de praktijk telt het werkpunt:
+recall 96,9% bij een PPV van 55,9%.</p>
+<div class="kop-blok"><h3 id="38-letterlijkheid">3.8 Letterlijkheid</h3>
+<p>594 van 594 getoonde passages (100%) stonden letterlijk in de kaarttekst.</p></div>
+<div class="kop-blok"><h2 id="4-foutenanalyse">4. Foutenanalyse</h2>
+<p>Tegen E1 miste het systeem 5 aandachtspunten. In alle gevallen stond de informatie in de kaart, en bij 4 had het systeem
+die in de zoekstap ook gevonden. De passage bereikte het rapport niet door een stap daarna (de gevallen zijn genummerd zonder verwijzing naar het kaartnummer):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Geval</th>
+<th>Aandachtspunt</th>
+<th>Oorzaak</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Zwangerschapsinterval &lt; 1 jaar</td>
+<td>Combinatie van passages nodig (rekenen met datums)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Herhaalde miskramen vanaf drie</td>
+<td>Combinatie van passages nodig (tellen); samengesteld citaat afgewezen door de letterlijkheidscontrole</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Chronische hypertensie</td>
+<td>Grens van de definitie; de termijn stond niet in de passage</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Roken in de zwangerschap</td>
+<td>Relevantiefilter te streng</td>
+</tr>
+<tr>
+<td>3</td>
+<td>HIV</td>
+<td>Python-regel zonder terugval naar de modelroute</td>
+</tr>
+</tbody>
+</table></div></div>
+<p>Drie beoordelingen gingen na inzage van 1 naar 0; in twee daarvan toonde het systeem terecht niets. De volledige
+foutenanalyse staat in <a href="#bijlage-b-foutenanalyse">bijlage B</a>.</p>
+<div class="kop-blok"><h2 id="5-discussie">5. Discussie</h2>
+<h3 id="51-belangrijkste-bevindingen">5.1 Belangrijkste bevindingen</h3>
+<p>Het systeem noemde 96,9% van de aandachtspunten die volgens de gouden standaard van toepassing waren, en 94,2% van die
+volgens het blinde oordeel. Het verschil met de ontwikkelset (99,4%) is klein, wat wijst op beperkte overaanpassing aan de
+ontwikkelkaarten. Het zorgplan uit de huidige praktijk bevatte ongeveer de helft tot drie vijfde van de aandachtspunten.</p></div>
+<div class="kop-blok"><h3 id="52-sterke-punten">5.2 Sterke punten</h3>
+<ul>
+<li>Vooraf vastgelegd en openbaar protocol, bevroren versie, en vastlegging van elke beoordeling met tijdstempel voordat de
+  volgende stap begon.</li>
+<li>Twee onafhankelijke, blinde beoordelingen per kaart, met goede overeenstemming (kappa 0,81).</li>
+<li>Gepaarde vergelijking met de huidige praktijk op dezelfde kaarten.</li>
+<li>Volledig lokale verwerking; alleen letterlijke passages, wat de foutenanalyse herleidbaar maakt.</li>
+</ul></div>
+<div class="kop-blok"><h3 id="53-beperkingen">5.3 Beperkingen</h3>
+<ul>
+<li><strong>De gouden standaard is mede op basis van de systeemuitvoer vastgesteld</strong> (incorporation bias): aandachtspunten die
+  systeem, zorgplan en experts alle drie misten, komen niet boven. Daarom is ook de recall tegen het blinde oordeel
+  gerapporteerd; ook die voldoet aan het criterium.</li>
+<li><strong>De toegevoegde aandachtspunten zijn niet onafhankelijk bevestigd.</strong> De in het protocol voorziene blinde bevestiging
+  door een derde gynaecoloog (§4.4) is niet uitgevoerd. De toevoegingen zijn vastgesteld door beide gynaecologen in
+  consensus, nadat ze elke kaart eerst onafhankelijk hadden beoordeeld. Omdat het succescriterium al werd gehaald met het
+  blinde oordeel, had een toevoeging geen invloed op de uitkomst van de validatie; een te ruime gouden standaard zou
+  bovendien vervolgonderzoek naar het systeem bemoeilijken. De aanvullende signalering blijft een secundaire uitkomst
+  zonder onafhankelijke bevestiging.</li>
+<li><strong>Herhaalbaarheid</strong> (tweede run op 10 kaarten, protocol §9) is nog niet uitgevoerd.</li>
+<li><strong>Eén ziekenhuis</strong>, één verwijzingsstroom; de meest gangbare kaartformaten in Nederland zijn getest.</li>
+<li><strong>Het zorgplan</strong> legt vast wat de zorgverlener heeft opgeschreven, niet alles wat die heeft gezien of gewogen; het
+  verschil tussen systeem en zorgplan zegt daarom iets over vastleggen, niet per se over herkennen.</li>
+<li><strong>Zeldzame aandachtspunten</strong> komen in 40 kaarten weinig voor; per aandachtspunt is geen betrouwbare schatting mogelijk.</li>
+<li><strong>Het team ontwikkelde en beoordeelde.</strong> De beoordelaars kennen het project en de definities.</li>
+</ul></div>
+<div class="kop-blok"><h3 id="54-implicaties-en-vervolg">5.4 Implicaties en vervolg</h3>
+<p>De missers wijzen op concrete verbeteringen: een terugval naar de modelroute als een Python-regel geen waarde vindt, het
+tonen van de bouwstenen bij aandachtspunten die een combinatie van gegevens vragen, en meer context voor het
+relevantiefilter. Elke verbetering wordt een nieuwe versie die eerst op de ontwikkelset en de validatieset wordt getoetst
+(protocol §14). Na ingebruikname volgt doorlopende en kwartaalmonitoring.</p></div>
+<div class="kop-blok"><h2 id="6-afwijkingen-van-het-protocol">6. Afwijkingen van het protocol</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Onderdeel</th>
+<th>Afwijking</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§4.4 Blinde bevestiging</td>
+<td>Niet uitgevoerd; zie §5.3.</td>
+</tr>
+<tr>
+<td>§9 Herhaalbaarheid</td>
+<td>Nog niet uitgevoerd.</td>
+</tr>
+<tr>
+<td>§4.6 Scoring</td>
+<td>Beoordelingen alleen 1 of 0; de categorie "niet in de kaart" vervalt (vastgesteld 20-10-2026, vóór vastlegging van E0).</td>
+</tr>
+<tr>
+<td>§3 Nummering</td>
+<td>Validatiekaarten genummerd 042–081 in plaats van 41–80.</td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="kop-blok"><h2 id="7-conclusie">7. Conclusie</h2>
+<p>ZwangerenkaartAI noemde 96,9% van de aandachtspunten die volgens de gouden standaard van toepassing waren, en voldoet
+daarmee ruim aan het vooraf vastgelegde criterium van 90%, ook tegen het blinde oordeel van de experts. Het systeem toonde
+aanzienlijk meer van deze aandachtspunten dan in het zorgplan werden vastgelegd, met gemiddeld drie onterecht getoonde
+aandachtspunten per kaart en uitsluitend letterlijke passages.</p></div>
+<div class="kop-blok"><h2 id="verantwoording">Verantwoording</h2>
+<p><strong>Gegevens en code.</strong> De beoordelingen (E0_A, E0_B, E0, ZP, E1; kaartnummer, aandachtspunt, 0/1) staan in
+<a href="https://github.com/Andymaarten/ZwangerenkaartAI/tree/main/docs/resultaten/validatie"><code>docs/resultaten/validatie/</code></a>, de
+analysescripts in <a href="https://github.com/Andymaarten/ZwangerenkaartAI/tree/main/tools"><code>tools/</code></a>. Kaartteksten en
+systeemuitvoer bevatten patiëntgegevens en blijven binnen het ziekenhuis. De broncode, prompts en definities zijn op
+aanvraag beschikbaar voor reviewers.</p></div>
+<p><strong>Ethiek.</strong> De validatie is uitgevoerd met bestaande zwangerenkaarten en zorgplannotities, na schriftelijke toestemming
+van de deelnemers en onder een onderzoeksnummer. De zorg voor de deelnemers veranderde niet.</p>
+<div class="kop-blok"><h2 id="bijlage-b-foutenanalyse">Bijlage B. Foutenanalyse</h2>
+<h3 id="b1-missers-tegen-e1">B.1 Missers tegen E1</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Geval</th>
+<th>AP</th>
+<th>Route</th>
+<th>In zorgplan</th>
+<th>Wat er gebeurde</th>
+<th>Categorie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>AP059 Zwangerschapsinterval &lt; 1 jaar</td>
+<td>model</td>
+<td>nee</td>
+<td>De vorige bevalling staat alleen met jaartal in de kaart; Python kon het interval niet berekenen en gaf het aandachtspunt terecht door aan de modelroute. Het interval volgt alleen uit twee passages samen (vorige bevalling en à terme datum). De zoekstap vond beide, maar rekende de conceptiedatum verkeerd uit. De regel met de à terme datum viel weg in het Python-filter ("geen inhoud"), en de passage over de vorige bevalling kwam niet door het relevantiefilter, omdat die passage alleen het interval niet aantoont.</td>
+<td>Combinatie van passages nodig (rekenen met datums)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>AP013 Chronische hypertensie</td>
+<td>model</td>
+<td>nee</td>
+<td>De zoekstap vond twee passages over herhaald hoge bloeddruk en noemde in het argument de termijn (vóór 20 weken, zoals de definitie vraagt). De passages zelf noemen geen termijn, en een derde passage zegt dat het zorgpad afhangt van een tweede controle. Het relevantiefilter beoordeelde de passages zonder die termijn en liet ze niet door; de gynaecologen vonden het aandachtspunt wel van toepassing.</td>
+<td>Definitiegrens; termijn ontbrak in de passage</td>
+</tr>
+<tr>
+<td>3</td>
+<td>AP031 HIV</td>
+<td>Python</td>
+<td>ja</td>
+<td>De Python-regel kon de waarde niet bepalen, maar het aandachtspunt ging niet door naar de modelroute. Volgens het ontwerp had dat wel moeten gebeuren.</td>
+<td>Python-route zonder terugval (vermoedelijk fout in de code)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AP030 Herhaalde miskramen vanaf drie</td>
+<td>model</td>
+<td>nee</td>
+<td>De zoekstap gaf het juiste argument (drie miskramen) met een citaat dat uit drie losse stukken was samengesteld; dat citaat haalde de letterlijkheidscontrole niet. De overgebleven passages beschrijven elk één miskraam en tonen afzonderlijk niet "drie of meer", en kwamen daardoor niet door het relevantiefilter.</td>
+<td>Combinatie van passages nodig (tellen); samengesteld citaat afgewezen</td>
+</tr>
+<tr>
+<td>5</td>
+<td>AP069 Roken in de zwangerschap</td>
+<td>model</td>
+<td>nee</td>
+<td>De juiste passage werd letterlijk gevonden, maar kwam net niet door het relevantiefilter, mogelijk door de formulering met "minder dan".</td>
+<td>Relevantiefilter te streng</td>
+</tr>
+</tbody>
+</table></div></div>
+<p>Samengevat: 2× een combinatie van passages nodig (tellen, rekenen met datums), 1× definitiegrens (de termijn stond
+wel in de zoekstap maar niet in de passage), 1× relevantiefilter te streng, 1× Python-route zonder terugval. Bij AP030
+en AP059 bevatte geen enkele losse passage het hele antwoord.</p>
+<div class="kop-blok"><h3 id="b2-omgekeerde-wijzigingen-e0-1-e1-0">B.2 Omgekeerde wijzigingen (E0 = 1, E1 = 0)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Geval</th>
+<th>AP</th>
+<th>Reden (E1)</th>
+<th>Toelichting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>AP037 Zwanger na fertiliteitsbehandeling</td>
+<td>c</td>
+<td>De kaart vermeldt alleen dat de fertiliteitskliniek op de hoogte gebracht moest worden, niet dat de zwangerschap na een behandeling is ontstaan. Het systeem toonde terecht niets; na inzage pasten de gynaecologen hun eerste oordeel aan.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>AP081 Risicofactoren diabetes gravidarum</td>
+<td>b</td>
+<td>Andere toepassing van de definitie (methode A, §4.8).</td>
+</tr>
+<tr>
+<td>C</td>
+<td>AP022 Dysmaturiteit in anamnese</td>
+<td>c</td>
+<td>Een geboortegewicht op de grenswaarde (P10) is volgens de definitie niet "onder P10". Het systeem toonde terecht niets; de passage viel weg in het Python-filter.</td>
+</tr>
+</tbody>
+</table></div></div>
+<p>Deze gevallen tellen tegen E0 als misser en tegen E1 niet. Ze laten zien dat de herziening twee kanten op ging.</p>
+<div class="kop-blok"><h3 id="b3-onterecht-getoonde-aandachtspunten">B.3 Onterecht getoonde aandachtspunten</h3>
+<p>123 aandachtspunten met passages die volgens E1 niet van toepassing zijn (3,1 per kaart; PPV 55,9%). Ze komen alle uit
+de modelroute; geen uit een Python-regel.</p></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>AP</th>
+<th>Aandachtspunt</th>
+<th>Onterecht getoond (kaarten)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AP053</td>
+<td>Trombose en trombofilie (profylaxe kraambed)</td>
+<td>16</td>
+</tr>
+<tr>
+<td>AP088</td>
+<td>Congenitale afwijking bij eerder kind</td>
+<td>11</td>
+</tr>
+<tr>
+<td>AP009</td>
+<td>(Sub)totaalruptuur in anamnese</td>
+<td>8</td>
+</tr>
+<tr>
+<td>AP047</td>
+<td>Vroeggeboorte &lt; 34 w in anamnese</td>
+<td>6</td>
+</tr>
+<tr>
+<td>AP080</td>
+<td>Algemene schildklierproblemen</td>
+<td>5</td>
+</tr>
+<tr>
+<td>AP002</td>
+<td>Asfyxie of perinatale sterfte in anamnese</td>
+<td>5</td>
+</tr>
+<tr>
+<td>AP055</td>
+<td>Verdenking FGR huidige zwangerschap</td>
+<td>5</td>
+</tr>
+<tr>
+<td>AP019</td>
+<td>Diabetes gravidarum huidige zwangerschap</td>
+<td>5</td>
+</tr>
+<tr>
+<td>overige 33 AP's</td>
+<td></td>
+<td>62</td>
+</tr>
+</tbody>
+</table></div>
+<p>Per categorie: vorige zwangerschap, bevalling of kraamtijd 40; huidige zwangerschap 33; indicatie 32; medische
+voorgeschiedenis 13; overig 5.</p>
+<p>Van de 123 stonden er 4 ook in het zorgplan (zorgplan en systeem beide onterecht volgens E1); 119 alleen in het rapport
+van het systeem (zie de indeling E1 · ZP · M in <code>secundair.md</code>).</p>
+<div class="kop-blok"><h3 id="b4-conclusies">B.4 Conclusies</h3>
+<ol>
+<li>Het systeem vond de relevante informatie bijna altijd. De missers ontstonden in de stappen daarna, die passages
+   wegfilteren: de Python-route, het relevantiefilter en de letterlijkheidscontrole van samengestelde citaten.</li>
+<li>Eén misser (AP031) komt door een ontbrekende terugval naar de modelroute; dat is een concrete, op te lossen fout en
+   klinisch de zwaarste.</li>
+<li>Aandachtspunten waarvoor gegevens gecombineerd moeten worden (tellen, rekenen met datums) passen slecht bij een filter
+   dat passages afzonderlijk beoordeelt.</li>
+<li>De onterecht getoonde aandachtspunten zijn geconcentreerd in een klein aantal aandachtspunten; gerichte aanpassing
+   van de definities kan het aantal per kaart verlagen zonder de recall te raken.</li>
+</ol></div>
+<div class="kop-blok"><h3 id="b5-verbeteringen-voor-een-volgende-versie-niet-in-de-gevalideerde-versie">B.5 Verbeteringen voor een volgende versie (niet in de gevalideerde versie)</h3>
+<p>De rode draad: minder wegfilteren en vaker de bouwstenen tonen, zodat de zorgverlener zelf combineert en beoordeelt.
+Elke verbetering wordt een nieuwe versie die eerst op de ontwikkelset en de validatieset draait (protocol §14).</p></div>
+<ol>
+<li>Python-regel zonder bepaalde waarde: altijd door naar de modelroute. Controleren op alle kaarten of dit vaker
+   voorkomt.</li>
+<li>Samengestelde citaten met "…" per fragment controleren, zoals bij de vragen al gebeurt.</li>
+<li>Aantal miskramen door Python laten tellen (nieuwe grootheid), naar het voorbeeld van het interval.</li>
+<li>Bij aandachtspunten die een combinatie van gegevens vragen (interval, aantal): de bouwstenen (vorige bevalling, à terme
+   datum, de afzonderlijke miskramen) altijd tonen als Python de uitkomst niet zeker kan bepalen, zonder ze door het
+   relevantiefilter te laten gaan. De à terme datum niet als "geen inhoud" wegfilteren bij AP059.</li>
+<li>Het relevantiefilter de zwangerschapsduur bij de passage en het argument uit de zoekstap meegeven, zodat een tijdseis
+   in de definitie ("vóór 20 weken") te toetsen is.</li>
+<li>Definities aanscherpen voor de aandachtspunten met de meeste onterecht getoonde passages (AP053, AP088, AP009).</li>
+</ol>
+</main></div>
+<footer><div class="wrap"><p>© 2026 de auteurs. Alle rechten voorbehouden. Niet bedoeld voor klinisch gebruik buiten de validatieomgeving.</p></div></footer>
+</body></html>

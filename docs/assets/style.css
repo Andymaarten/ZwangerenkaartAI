@@ -167,3 +167,7 @@ footer { border-top: 1px solid var(--border); padding: 2rem 0 3rem; font-size: .
 .doc blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--accent); background: var(--surface); }
 .doc li { margin: .25rem 0; }
 .doc pre code { background: none; padding: 0; }
+
+.cta { display: flex; justify-content: center; margin: 2rem 0 1.2rem; }
+.btn-groot { font-size: 1.08rem; padding: .85rem 1.6rem; border-radius: 10px; font-weight: 600; }
+.na-cta { margin-top: 3rem; }
