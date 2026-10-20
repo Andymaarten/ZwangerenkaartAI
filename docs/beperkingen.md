@@ -32,5 +32,5 @@ positieven verliest. Beide sets blijven daarvoor beschikbaar.
 
 **Het zorgplan als vergelijking.** Het zorgplan legt vast wat de zorgverlener heeft opgeschreven, niet alles wat die
 heeft gezien of gewogen. We gebruiken daarom steeds dezelfde notitie (de eerste zorgplannotitie na verwijzing), laten
-die coderen door een onderzoeker die los staat van de experts, en tellen aandachtspunten die alleen uit het consult
-komen niet mee.
+die coderen door een onderzoeker die los staat van de experts, en rapporteren zorgplanpunten die niet uit de kaart komen
+apart.

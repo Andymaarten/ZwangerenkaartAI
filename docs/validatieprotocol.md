@@ -120,9 +120,11 @@ Per kaart en per aandachtspunt worden vier beoordelingen vastgelegd (0 = niet va
    de kaart niet eerder beoordeelde en niet weet uit welke groep een geval komt.
 5. **Codeboek en twijfelgevallen.** Het codeboek is de `betekenis` per aandachtspunt in `aandachtspunten.json` van de
    bevroren versie. Een twijfelgeval krijgt een opmerking in het bestand en wordt in de consensus besproken.
-6. **Niet in de kaart.** Een aandachtspunt dat de experts of het zorgplan kennen uit een andere bron dan deze
-   zwangerenkaart (bijvoorbeeld informatie uit het consult), krijgt de aantekening "niet in de kaart" en telt niet mee
-   voor de vergelijkingen. Het aantal wordt gerapporteerd.
+6. **Alleen 1 of 0.** Elke beoordeling is 1 of 0; er blijft niets leeg. De experts scoren alleen wat in de
+   zwangerenkaart staat: een aandachtspunt dat alleen uit een andere bron bekend is (bijvoorbeeld het consult), is 0.
+   ZP codeert wat in de zorgplannotitie staat; een zorgplanpunt dat niet uit de kaart komt, valt in §8 onder
+   "zorgplanpunt dat de experts niet uit de kaart halen". Een kaart zonder zorgplannotitie ontbreekt in zijn geheel in
+   ZP (§3). De analysescripts stoppen bij een andere waarde of een ontbrekende regel.
 7. **AP079 (kwetsbaarheden)** telt niet mee voor de primaire uitkomst en wordt apart beschreven.
 8. **Samengestelde aandachtspunten** (risicofactoren voor pre-eclampsie, diabetes gravidarum en trombose): het
    aandachtspunt is 1 als minstens één factor uit de factorlijst van de bevroren versie in de kaart staat ("methode A",
